@@ -3,14 +3,25 @@
   "private": true,
   "module": "src/index.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./out/index.js",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "build": "bun build --entrypoints ./src/index.ts --outdir ./out --target bun --sourcemap=external --minify"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "scripts": {
-    "dev": "bun --hot src/index.ts",
-    "build": "bun build --entrypoints ./src/index.ts --outdir ./out --target bun --sourcemap=external --minify"
+  "dependencies": {
+    "@elysiajs/cors": "^1.0.2",
+    "@elysiajs/swagger": "^1.0.5",
+    "elysia": "^1.0.22"
   }
 }

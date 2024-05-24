@@ -11,5 +11,9 @@
   "devDependencies": {
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@elysiajs/eden": "^1.0.14",
+    "server": "workspace:^"
   }
 }
