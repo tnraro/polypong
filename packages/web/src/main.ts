@@ -92,8 +92,8 @@ function render() {
 
     context.beginPath();
 
-    context.moveTo(-100, MAP_RADIUS);
-    context.lineTo(100, MAP_RADIUS);
+    context.moveTo(-32, MAP_RADIUS - 16);
+    context.lineTo(32, MAP_RADIUS - 16);
 
     context.stroke();
 
