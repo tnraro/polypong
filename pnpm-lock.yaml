@@ -22,6 +22,9 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.4.5
+      utils:
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       '@types/bun':
         specifier: latest
@@ -45,6 +48,9 @@ importers:
       server:
         specifier: workspace:^
         version: link:../server
+      utils:
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       typescript:
         specifier: ^5.2.2

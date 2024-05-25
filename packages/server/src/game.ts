@@ -1,13 +1,11 @@
+import { clamp } from "utils";
+
 export class Player {
   readonly id: string;
   #x = 0.5;
   get x() { return this.#x };
   set x(value: number) {
     this.#x = clamp(value, 0, 1);
-
-    function clamp(value: number, min: number, max: number) {
-      return Math.min(Math.max(value, min), max);
-    }
   }
   constructor(id: string) {
     this.id = id;
