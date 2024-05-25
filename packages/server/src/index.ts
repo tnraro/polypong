@@ -22,7 +22,7 @@ export const app = new Elysia()
     },
     close(ws) {
       app.server?.publish(ws.data.query.room, JSON.stringify({ type: "player:leave", id: ws.id }), true);
-      gameManager.add(ws.data.query.room, ws.id);
+      gameManager.remove(ws.data.query.room, ws.id);
       ws.unsubscribe(ws.data.query.room);
     },
   })
