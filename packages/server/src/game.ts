@@ -22,7 +22,8 @@ interface BallOptions {
   x: number,
   y: number,
   vx: number,
-  vy: number
+  vy: number,
+  speed: number,
 }
 export class Ball {
   readonly id: string;
@@ -42,7 +43,7 @@ export class Ball {
     this.#y = options.y ?? 0;
     this.#vx = options.vx ?? 1;
     this.#vy = options.vy ?? 0;
-    this.#speed = 100;
+    this.#speed = options.speed ?? 100;
   }
   move(delta: number) {
     this.#x += this.#vx * this.#speed * delta;
