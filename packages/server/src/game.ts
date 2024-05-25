@@ -34,16 +34,19 @@ export class Ball {
   get vx() { return this.#vx };
   #vy: number;
   get vy() { return this.#vy };
+  #speed: number;
+  get speed() { return this.#speed };
   constructor(options: Partial<BallOptions>) {
     this.id = crypto.randomUUID();
     this.#x = options.x ?? 0;
     this.#y = options.y ?? 0;
     this.#vx = options.vx ?? 1;
     this.#vy = options.vy ?? 0;
+    this.#speed = 100;
   }
   move(delta: number) {
-    this.#x += this.#vx * delta;
-    this.#y += this.#vy * delta;
+    this.#x += this.#vx * this.#speed * delta;
+    this.#y += this.#vy * this.#speed * delta;
   }
   serialize() {
     return {
@@ -52,6 +55,7 @@ export class Ball {
       y: this.#y,
       vx: this.#vx,
       vy: this.#vy,
+      speed: this.#speed,
     }
   }
 }
