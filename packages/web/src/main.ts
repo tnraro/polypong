@@ -1,6 +1,7 @@
 import { treaty } from "@elysiajs/eden";
 import type { App } from "server";
 import "./style.css";
+import { clamp } from "utils";
 
 const client = treaty<App>(import.meta.env.VITE_API_ENTRYPOINT);
 
@@ -124,5 +125,16 @@ function resize() {
 }
 resize();
 window.addEventListener("resize", resize);
+
+function input(e: MouseEvent) {
+  const x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
+
+  ws.send({
+    type: "x",
+    value: x,
+  });
+}
+
+window.addEventListener("mousemove", input);
 
 document.querySelector("#ui")!.innerHTML = (await client.index.get()).data + "";
