@@ -21,6 +21,9 @@ export class GameManager {
       this.#games.delete(roomId);
     }
   }
+  get(roomId: string) {
+    return this.#games.get(roomId);
+  }
   update(delta: number) {
     for (const game of this.#games.values()) {
       game.update(delta);
