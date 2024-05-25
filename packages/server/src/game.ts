@@ -61,9 +61,16 @@ export class Ball {
   }
 }
 
+export enum GameState {
+  Idle,
+  Playing,
+  Result,
+}
+
 export class Game {
   players: Player[] = [];
   balls: Ball[] = [];
+  state: GameState = GameState.Idle;
   constructor() { }
   player(id: string) {
     return this.players.find(player => player.id === id);
