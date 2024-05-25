@@ -9,18 +9,8 @@ export class GameManager {
     this.#server = server;
   }
   add(roomId: string, playerId: string) {
-    const isNewGame = !this.#games.has(roomId);
     const game = this.#games.get(roomId) ?? new Game();
     game.addPlayer(playerId);
-    if (isNewGame) {
-      game.addBall({
-        x: 0,
-        y: 0,
-        vx: 0,
-        vy: 1,
-        speed: 100,
-      });
-    }
     this.#games.set(roomId, game);
   }
   remove(roomId: string, playerId: string) {
