@@ -10,8 +10,20 @@ export const app = new Elysia()
     query: t.Object({
       room: t.String(),
     }),
+    body: t.Union([
+      t.Object({
+        type: t.Literal("x"),
+        value: t.Number(),
+      })
+    ]),
     message(ws, message) {
-      console.log(ws.id, message);
+      if (message.type === "x") {
+        const game = gameManager.get(ws.data.query.room);
+        if (game == null) return;
+        const player = game.player(ws.id);
+        if (player == null) return;
+        player.x = message.value;
+      }
     },
     open(ws) {
       gameManager.ws = ws;
