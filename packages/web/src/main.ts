@@ -21,6 +21,7 @@ interface Ball {
   y: number;
   vx: number;
   vy: number;
+  speed: number;
 }
 interface World {
   players: Player[];
@@ -109,7 +110,7 @@ function render() {
     context.beginPath();
     context.strokeStyle = "red";
     context.moveTo(0, 0);
-    context.lineTo(ball.vx * 100, ball.vy * 100);
+    context.lineTo(ball.vx * ball.speed, ball.vy * ball.speed);
     context.stroke();
 
     context.restore();
