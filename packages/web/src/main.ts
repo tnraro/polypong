@@ -1,5 +1,6 @@
 import { treaty } from "@elysiajs/eden";
 import type { App } from "server";
+import "./style.css";
 
 const client = treaty<App>(import.meta.env.VITE_API_ENTRYPOINT);
 
@@ -23,4 +24,4 @@ ws.on("close", (e) => {
   console.log(e.type, e)
 });
 
-document.querySelector("#app")!.innerHTML = (await client.index.get()).data + "";
+document.querySelector("#ui")!.innerHTML = (await client.index.get()).data + "";
