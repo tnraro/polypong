@@ -28,7 +28,7 @@ export class GameManager {
   }
   publish() {
     for (const [id, game] of this.#games) {
-      this.#server.publish(id, JSON.stringify(game.serialize()), true);
+      this.#server.publish(id, JSON.stringify({ type: "snapshot", world: game.serialize() }), true);
     }
   }
   serialize() {
