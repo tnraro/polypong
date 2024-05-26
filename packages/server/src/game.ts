@@ -93,6 +93,12 @@ export class Game {
             ?.forEach(player => player.score += 1);
         }
 
+        this.physics.remove(body);
+        this.balls = this.balls
+          .filter(ball => ball.body !== body);
+
+        setTimeout(() => this.addBall(), 500);
+
         function getScoringPlayers(self: Game, ball: Ball) {
           if (ball.lastHitPlayerId != null) {
             const player = self.players.find(player => player.id === ball.lastHitPlayerId);
@@ -102,12 +108,6 @@ export class Game {
           }
           return self.players.filter(player => player.index !== index);
         }
-
-        this.physics.remove(body);
-        this.balls = this.balls
-          .filter(ball => ball.body !== body);
-
-        setTimeout(() => this.addBall(), 500);
       },
       onBallHit: (ballBody, playerBody) => {
         const ball = this.balls.find(ball => ball.body === ballBody);
