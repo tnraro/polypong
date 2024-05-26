@@ -13,6 +13,9 @@ export class Vec {
   distanceTo(vec: Vec) {
     return Math.hypot(vec.x - this.x, vec.y - this.y);
   }
+  static get zero() {
+    return new Vec(0, 0);
+  }
 }
 
 export class Segment {
