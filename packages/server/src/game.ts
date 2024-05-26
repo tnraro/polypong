@@ -28,6 +28,7 @@ export class Player {
     this.body = body;
     this.index = index;
     this.game = game;
+    this.x = 0.5;
   }
   serialize() {
     return {
