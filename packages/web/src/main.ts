@@ -144,6 +144,8 @@ function render() {
 
     context.beginPath();
     context.arc(0, 0, ball.radius, 0, Math.PI * 2);
+    context.fillStyle = "white";
+    context.fill();
     context.stroke();
 
     context.restore();
