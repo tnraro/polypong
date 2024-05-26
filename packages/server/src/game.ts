@@ -86,14 +86,18 @@ export class Game {
 
         const ball = this.balls.find(ball => ball.body === body);
         if (ball != null) {
+          getScoringPlayers(this, ball)
+            ?.forEach(player => player.score += 1);
+        }
+
+        function getScoringPlayers(self: Game, ball: Ball) {
           if (ball.lastHitPlayerId != null) {
-            const player = this.players.find(player => player.index !== index && player.id === ball.lastHitPlayerId);
-            if (player != null) player.score += 1;
-          } else {
-            this.players
-              .filter(player => player.index !== index)
-              .forEach(player => player.score += 1);
+            const player = self.players.find(player => player.id === ball.lastHitPlayerId);
+            if (player != null && player.index !== index) {
+              return [player];
+            }
           }
+          return self.players.filter(player => player.index !== index);
         }
 
         this.physics.remove(body);
