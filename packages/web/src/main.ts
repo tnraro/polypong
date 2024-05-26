@@ -112,7 +112,7 @@ function render() {
     context.translate(ball.x, ball.y);
 
     context.beginPath();
-    context.arc(0, 0, 8, 0, Math.PI * 2);
+    context.arc(0, 0, ball.radius, 0, Math.PI * 2);
     context.stroke();
 
     context.restore();
