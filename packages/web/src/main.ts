@@ -239,9 +239,7 @@ async function run(options: { nickname: string }) {
   window.addEventListener("resize", resize);
 
   let x = 0.5;
-  let isDown = false;
   function input(e: MouseEvent) {
-    if (!isDown) return;
     x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
 
     ws.send({
@@ -250,7 +248,5 @@ async function run(options: { nickname: string }) {
     });
   }
 
-  window.addEventListener("mousedown", () => { isDown = true; });
-  window.addEventListener("mouseup", () => { isDown = false; });
   window.addEventListener("mousemove", input);
 }
