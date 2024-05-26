@@ -45,6 +45,7 @@ export class Ball {
   get y() { return this.body.position.y };
   get vx() { return this.body.velocity.x };
   get vy() { return this.body.velocity.y };
+  get radius() { return this.body.circleRadius! };
   constructor(body: Body) {
     this.id = crypto.randomUUID();
     this.body = body;
@@ -61,6 +62,7 @@ export class Ball {
       y: this.y,
       vx: this.vx,
       vy: this.vy,
+      radius: this.radius,
     }
   }
 }
