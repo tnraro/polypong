@@ -143,8 +143,8 @@ export class Physics {
     const theta = Math.random() * 2 * Math.PI;
     const ball = Bodies.circle(0, 0, 8, {
       force: {
-        x: Math.cos(theta) * 0.004,
-        y: Math.sin(theta) * 0.004
+        x: Math.cos(theta) * 4000,
+        y: Math.sin(theta) * 4000
       },
       restitution: 2,
       frictionAir: 0.001,
