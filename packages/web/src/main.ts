@@ -161,8 +161,13 @@ function render() {
 window.requestAnimationFrame(render);
 
 const $ui = document.querySelector<HTMLDivElement>("#ui")!;
+let cache = "";
 function renderUi() {
-  $ui.innerHTML = `<ul>${world.players.map(player => `<li>${player.name} — ${player.score}</li>`).join("")}</ui>`;
+  const html = `<ul>${world.players.map(player => `<li>${player.name} — ${player.score}</li>`).join("")}</ui>`;
+  if (cache !== html) {
+    $ui.innerHTML = html;
+    cache = html;
+  }
 
   window.requestAnimationFrame(renderUi);
 }
