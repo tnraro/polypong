@@ -72,8 +72,16 @@ export class Game {
   players: Player[] = [];
   balls: Ball[] = [];
   state: GameState = GameState.Idle;
-  physics = new Physics();
-  constructor() { }
+  physics;
+  constructor() {
+    this.physics = new Physics({
+      onBallOut: (body) => {
+        this.physics.removeBall(body);
+        this.balls = this.balls
+          .filter(ball => ball.body !== body)
+      },
+    });
+  }
   player(id: string) {
     return this.players.find(player => player.id === id);
   }
