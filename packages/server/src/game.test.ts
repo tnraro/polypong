@@ -8,6 +8,7 @@ describe("Game", () => {
     expect(game.player("p1")?.serialize()).toStrictEqual({
       id: "p1",
       x: 0.5,
+      index: 0,
     });
     expect(game.serialize()).toStrictEqual({
       players: [

@@ -4,19 +4,22 @@ import { clamp } from "utils";
 export class Player {
   readonly id: string;
   readonly body: Body;
+  index;
   #x = 0.5;
   get x() { return this.#x };
   set x(value: number) {
     this.#x = clamp(value, 0, 1);
   }
-  constructor(id: string, body: Body) {
+  constructor(id: string, body: Body, index: number) {
     this.id = id;
     this.body = body;
+    this.index = index;
   }
   serialize() {
     return {
       id: this.id,
       x: this.#x,
+      index: this.index,
     }
   }
 }
@@ -81,10 +84,15 @@ export class Game {
   }
   addPlayer(id: string) {
     const body = this.physics.createPlayer();
-    this.players.push(new Player(id, body));
+    this.players.push(new Player(id, body, this.players.length));
   }
   removePlayer(id: string) {
-    this.players = this.players.filter(player => player.id !== id);
+    this.players = this.players
+      .filter(player => player.id !== id)
+      .map((player, index) => {
+        player.index = index;
+        return player
+      });
   }
   ball(id: string) {
     return this.balls.find(ball => ball.id === id);
@@ -99,10 +107,7 @@ export class Game {
   }
   serialize() {
     return {
-      players: this.players.map((player, index) => ({
-        ...player.serialize(),
-        index,
-      })),
+      players: this.players.map(player => player.serialize()),
       balls: this.balls.map(ball => ball.serialize()),
     }
   }
