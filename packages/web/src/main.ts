@@ -105,6 +105,8 @@ async function run(options: { nickname: string }) {
 
     context.save();
     context.translate($canvas.width / 2, $canvas.height / 2);
+
+    drawControlIndicator(context);
     context.rotate(-(myIndex() + 0.5) * getPie() + Math.PI / 2);
 
     drawMap(context);
@@ -185,6 +187,32 @@ async function run(options: { nickname: string }) {
 
       context.restore();
     }
+    function drawControlIndicator(context: CanvasRenderingContext2D) {
+      context.save();
+      context.translate(0, window.innerHeight / 3);
+
+      context.beginPath();
+      context.strokeStyle = "hsl(120deg 8% 64%)";
+      context.fillStyle = "hsl(120deg 8% 64% / 0.75)";
+      context.roundRect(-160, -16, 320, 32, 16);
+      context.stroke();
+
+      context.save();
+      context.translate((0.5 - x) * 280, 0);
+      context.beginPath();
+      context.strokeStyle = "hsl(120deg 8% 64%)";
+      context.fillStyle = "white";
+      context.roundRect(-16, -12, 32, 24, 12);
+      context.moveTo(-2, -6);
+      context.lineTo(-2, 6);
+      context.moveTo(2, -6);
+      context.lineTo(2, 6);
+      context.fill();
+      context.stroke();
+      context.restore();
+
+      context.restore();
+    }
   }
   window.requestAnimationFrame(render);
 
@@ -210,8 +238,11 @@ async function run(options: { nickname: string }) {
   resize();
   window.addEventListener("resize", resize);
 
+  let x = 0.5;
+  let isDown = false;
   function input(e: MouseEvent) {
-    const x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
+    if (!isDown) return;
+    x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
 
     ws.send({
       type: "x",
@@ -219,6 +250,8 @@ async function run(options: { nickname: string }) {
     });
   }
 
+  window.addEventListener("mousedown", () => { isDown = true; });
+  window.addEventListener("mouseup", () => { isDown = false; });
   window.addEventListener("mousemove", input);
 
   document.querySelector("#ui")!.innerHTML = (await client.index.get()).data + "";
