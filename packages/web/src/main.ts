@@ -109,11 +109,6 @@ function render() {
     context.arc(0, 0, 8, 0, Math.PI * 2);
     context.stroke();
 
-    context.beginPath();
-    context.strokeStyle = "red";
-    context.moveTo(0, 0);
-    context.stroke();
-
     context.restore();
   }
 }
