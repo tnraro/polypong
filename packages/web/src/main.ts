@@ -64,6 +64,7 @@ async function run(options: { nickname: string }) {
     balls: [],
   };
   let me: string;
+  let ballOut: { index: number, alpha: number } | undefined;
   function myIndex() {
     return world.players.find(player => player.id === me)?.index ?? 0;
   }
@@ -81,6 +82,12 @@ async function run(options: { nickname: string }) {
     }
     if (data.type === "me:enter") {
       me = data.id;
+    }
+    if (data.type === "ballOut") {
+      ballOut = {
+        index: data.index,
+        alpha: 1,
+      }
     }
   });
   ws.on("error", (e) => {
@@ -110,6 +117,7 @@ async function run(options: { nickname: string }) {
     context.rotate(-(myIndex() + 0.5) * getPie() + Math.PI / 2);
 
     drawMap(context);
+    drawBallOutIndicator(context);
 
     for (const player of world.players) {
       drawPlayer(context, player);
@@ -149,6 +157,32 @@ async function run(options: { nickname: string }) {
       context.stroke();
 
       context.restore();
+    }
+    function drawBallOutIndicator(context: CanvasRenderingContext2D) {
+      if (ballOut == null) return;
+      context.save();
+
+      context.rotate(ballOut.index * getPie());
+      const gradient = context.createRadialGradient(0, 0, 0, 0, 0, MAP_RADIUS);
+      gradient.addColorStop(0.8, `hsl(${color()} 90% 60% / 0)`);
+      gradient.addColorStop(0.95, `hsl(${color()} 90% 65% / ${ballOut.alpha * 0.1})`);
+      gradient.addColorStop(1, `hsl(${color()} 90% 70% / ${ballOut.alpha * 0.3})`);
+
+      context.beginPath();
+      context.arc(0, 0, MAP_RADIUS, 0, getPie());
+      context.fillStyle = gradient;
+      context.fill();
+
+      context.restore();
+
+      ballOut.alpha -= 0.1;
+      if (ballOut.alpha < 0) {
+        ballOut = undefined;
+      }
+      function color() {
+        if (ballOut?.index === myIndex()) return "23deg";
+        return "200deg";
+      }
     }
     function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
       context.save();
