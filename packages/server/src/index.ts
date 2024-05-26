@@ -28,7 +28,7 @@ export const app = new Elysia()
     open(ws) {
       gameManager.ws = ws;
       ws.subscribe(ws.data.query.room);
-      gameManager.add(ws.data.query.room, ws.id);
+      gameManager.add(ws.data.query.room, ws.id, "임시 이름");
       app.server?.publish(ws.data.query.room, JSON.stringify({ type: "playerEnter", id: ws.id }), true);
       ws.send({ type: "me:enter", id: ws.id });
     },

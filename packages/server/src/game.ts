@@ -5,6 +5,7 @@ export class Player {
   readonly id: string;
   readonly body: Body;
   readonly game: Game;
+  readonly name: string;
   index;
   #x = 0.5;
   get x() { return this.#x };
@@ -25,11 +26,12 @@ export class Player {
     Body.setAngle(this.body, theta + Math.PI / 2);
   }
   score = 0;
-  constructor(id: string, body: Body, index: number, game: Game) {
+  constructor(id: string, body: Body, index: number, game: Game, name: string) {
     this.id = id;
     this.body = body;
     this.index = index;
     this.game = game;
+    this.name = name;
   }
   serialize() {
     return {
@@ -37,6 +39,7 @@ export class Player {
       x: this.#x,
       index: this.index,
       score: this.score,
+      name: this.name,
     }
   }
 }
@@ -121,9 +124,9 @@ export class Game {
   player(id: string) {
     return this.players.find(player => player.id === id);
   }
-  addPlayer(id: string) {
+  addPlayer(id: string, name: string) {
     const body = this.physics.createPlayer();
-    const player = new Player(id, body, this.players.length, this);
+    const player = new Player(id, body, this.players.length, this, name);
     this.players.push(player);
     player.x = 0.5;
   }

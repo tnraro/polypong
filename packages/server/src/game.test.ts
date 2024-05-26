@@ -4,9 +4,10 @@ import { Game } from "./game";
 describe("Game", () => {
   test("addPlayer", () => {
     const game = new Game();
-    game.addPlayer("p1");
+    game.addPlayer("p1", "name");
     expect(game.player("p1")?.serialize()).toStrictEqual({
       id: "p1",
+      name: "name",
       x: 0.5,
       index: 0,
       score: 0,
@@ -15,6 +16,7 @@ describe("Game", () => {
       players: [
         {
           id: "p1",
+          name: "name",
           x: 0.5,
           index: 0,
           score: 0,

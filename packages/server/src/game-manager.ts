@@ -8,9 +8,9 @@ export class GameManager {
   constructor(server: Server) {
     this.#server = server;
   }
-  add(roomId: string, playerId: string) {
+  add(roomId: string, playerId: string, name: string) {
     const game = this.#games.get(roomId) ?? new Game();
-    game.addPlayer(playerId);
+    game.addPlayer(playerId, name);
     this.#games.set(roomId, game);
   }
   remove(roomId: string, playerId: string) {
