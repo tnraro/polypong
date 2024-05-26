@@ -121,6 +121,7 @@ export class Physics {
   })
   table = Bodies.circle(0, 0, 16 * 20, { isSensor: true, isStatic: true });
   constructor(options?: { onBallOut?: (ball: Body) => void }) {
+    Composite.add(this.engine.world, [this.table]);
     Events.on(this.engine, "collisionEnd", (e) => {
       for (const pair of e.pairs) {
         if (!pair.isSensor) continue;
