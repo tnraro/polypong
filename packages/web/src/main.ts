@@ -1,92 +1,138 @@
-import { Bodies, Body, Composite, Engine, Events, Pair, Render, Runner } from "matter-js";
+import { treaty } from "@elysiajs/eden";
+import type { App } from "server";
+import "./style.css";
 import { clamp } from "utils";
+
+const client = treaty<App>(import.meta.env.VITE_API_ENTRYPOINT);
+
+const ws = client.ws.subscribe({
+  query: {
+    room: "53",
+  }
+});
+
+interface Player {
+  id: string;
+  x: number;
+  index: number;
+}
+interface Ball {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+}
+interface World {
+  players: Player[];
+  balls: Ball[];
+}
+
+let world: World = {
+  players: [],
+  balls: [],
+};
+let me: string;
+ws.on("open", (e) => {
+  console.log(e.type, e);
+});
+ws.subscribe((message) => {
+  const data: any = message.data;
+  if (data.type === "snapshot") {
+    world = data.world;
+  }
+  if (data.type === "me:enter") {
+    me = data.id;
+  }
+});
+ws.on("error", (e) => {
+  console.error(e.type, e)
+});
+ws.on("close", (e) => {
+  console.log(e.type, e)
+});
 
 const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 
-const engine = Engine.create({
-  gravity: { x: 0, y: 0 },
+const MAP_RADIUS = 16 * 20;
+function render() {
+  const context = $canvas?.getContext("2d");
+  if (context == null) return;
 
-});
+  context.clearRect(0, 0, $canvas.width, $canvas.height);
 
-const render = Render.create({
-  canvas: $canvas,
-  engine,
-  options: {
-    width: 480,
-    height: 720,
-    showAngleIndicator: true,
-    showVelocity: true,
+  context.save();
+  context.translate($canvas.width / 2, $canvas.height / 2);
+
+  drawMap(context);
+
+  for (const player of world.players) {
+    drawPlayer(context, player);
   }
-});
-Render.lookAt(render, {
-  min: { x: -240, y: -360 },
-  max: { x: 240, y: 360 },
-});
-
-const table = Bodies.circle(0, 0, 16 * 20, { isStatic: true, isSensor: true });
-
-Events.on(engine, "collisionEnd", (e) => {
-  for (const pair of e.pairs) {
-    if (!pair.isSensor) continue;
-    const ball = getBall(pair);
-    if (ball == null) continue;
-
-    Composite.remove(engine.world, ball);
-    console.log(ball);
-    Composite.add(engine.world, [createBall()]);
-
-    function getBall(pair: Pair) {
-      if (pair.bodyA === table) return pair.bodyB;
-      if (pair.bodyB === table) return pair.bodyA;
-    }
+  for (const ball of world.balls) {
+    drawBall(context, ball);
   }
-})
 
-function createBall() {
-  const theta = Math.random() * 2 * Math.PI;
-  const ball = Bodies.circle(0, 0, 8, {
-    force: {
-      x: Math.cos(theta) * 0.004,
-      y: Math.sin(theta) * 0.004
-    },
-    restitution: 2,
-    frictionAir: 0.001,
-  });
-  return ball;
+  context.restore();
+  window.requestAnimationFrame(render);
+
+  function drawMap(context: CanvasRenderingContext2D) {
+    context.beginPath();
+    context.arc(0, 0, MAP_RADIUS, 0, Math.PI * 2);
+    context.stroke();
+  }
+  function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
+    context.save();
+    const playersNum = world.players.length;
+
+    const pie = Math.PI * 2 / playersNum
+
+    context.rotate((player.index - 0.5 + player.x) * pie + Math.PI / 2);
+
+    context.beginPath();
+
+    context.fillRect(-32, MAP_RADIUS - 32, 64, 32);
+
+    context.stroke();
+
+    context.restore();
+  }
+  function drawBall(context: CanvasRenderingContext2D, ball: Ball) {
+    context.save();
+    context.translate(ball.x, ball.y);
+
+    context.beginPath();
+    context.arc(0, 0, 8, 0, Math.PI * 2);
+    context.stroke();
+
+    context.beginPath();
+    context.strokeStyle = "red";
+    context.moveTo(0, 0);
+    context.stroke();
+
+    context.restore();
+  }
 }
+window.requestAnimationFrame(render);
 
-const player = Bodies.rectangle(0, 0, 64, 32, {
-  isStatic: true,
-});
-Composite.add(engine.world, [player]);
+function resize() {
+  const rect = $canvas.getBoundingClientRect();
 
-Composite.add(engine.world, [table]);
-
-setInterval(() => {
-  Composite.add(engine.world, [createBall()]);
-}, 1000);
-
-Render.run(render);
-
-const runner = Runner.create();
-
-Runner.run(runner, engine);
+  $canvas.width = Math.floor(rect.width);
+  $canvas.height = Math.floor(rect.height);
+}
+resize();
+window.addEventListener("resize", resize);
 
 function input(e: MouseEvent) {
-  const nx = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
+  const x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
 
-  const playerNum = 3;
-  const index = 0;
-  const pie = Math.PI * 2 / playerNum;
-  const a = pie * index;
-  const b = pie * (index + 1);
-  const theta = (b - a) * nx + a;
-
-  Body.setPosition(player, {
-    x: Math.cos(theta) * 16 * 19,
-    y: Math.sin(theta) * 16 * 19,
+  ws.send({
+    type: "x",
+    value: x,
   });
-  Body.setAngle(player, theta + Math.PI / 2);
 }
 
 window.addEventListener("mousemove", input);
+
+document.querySelector("#ui")!.innerHTML = (await client.index.get()).data + "";
