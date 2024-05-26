@@ -62,13 +62,7 @@ export class Game {
     this.state = GameState.Lobby;
   }
   #onPlayerEnter(event: IntrinsicEvent["playerEnter"]) {
-    this.players.push({
-      id: event.id,
-      index: this.players.length,
-      name: "임시 이름",
-      score: 0,
-      x: 0.5,
-    });
+    this.players.push(createPlayer(event.id, this.players.length));
   }
   #onPlayerLeave(event: IntrinsicEvent["playerEnter"]) {
     this.players = this.players
@@ -81,7 +75,27 @@ export class Game {
   update(delta: number) {
     if (this.state !== GameState.Playing) return;
   }
-  reset() {
-    this.balls = [];
+}
+
+function createPlayer(id: string, index: number): Player {
+  return {
+    id,
+    index,
+    name: "임시 이름",
+    score: 0,
+    x: 0.5,
+  }
+}
+
+function createBall(index: number): Ball {
+  return {
+    id: String(index),
+    pos: {
+      x: 0, y: 0,
+    },
+    speed: 100,
+    vel: {
+      x: 0, y: 1,
+    }
   }
 }
