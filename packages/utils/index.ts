@@ -2,6 +2,10 @@ export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
+export interface IVec {
+  x: number;
+  y: number;
+}
 
 export class Vec {
   readonly x;
@@ -10,8 +14,11 @@ export class Vec {
     this.x = x;
     this.y = y;
   }
-  distanceTo(vec: Vec) {
+  distanceTo(vec: IVec) {
     return Math.hypot(vec.x - this.x, vec.y - this.y);
+  }
+  static get zero() {
+    return new Vec(0, 0);
   }
 }
 
@@ -22,7 +29,7 @@ export class Segment {
     this.a = a;
     this.b = b;
   }
-  distanceToPoint(point: Vec) {
+  distanceToPoint(point: IVec) {
     const distance = this.a.distanceTo(this.b);
     if (distance === 0) return this.a.distanceTo(point);
 

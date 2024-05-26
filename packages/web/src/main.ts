@@ -21,7 +21,7 @@ interface Ball {
   y: number;
   vx: number;
   vy: number;
-  speed: number;
+  radius: number;
 }
 interface World {
   players: Player[];
@@ -33,6 +33,13 @@ let world: World = {
   balls: [],
 };
 let me: string;
+function myIndex() {
+  return world.players.find(player => player.id === me)?.index ?? 0;
+}
+function getPie() {
+  const playersNum = world.players.length;
+  return Math.PI * 2 / playersNum;
+}
 ws.on("open", (e) => {
   console.log(e.type, e);
 });
@@ -60,9 +67,14 @@ function render() {
   if (context == null) return;
 
   context.clearRect(0, 0, $canvas.width, $canvas.height);
+  context.save();
+  context.fillStyle = "gainsboro";
+  context.fillRect(0, 0, $canvas.width, $canvas.height);
+  context.restore();
 
   context.save();
   context.translate($canvas.width / 2, $canvas.height / 2);
+  context.rotate(-(myIndex() + 0.5) * getPie() + Math.PI / 2);
 
   drawMap(context);
 
@@ -80,21 +92,48 @@ function render() {
     context.beginPath();
     context.arc(0, 0, MAP_RADIUS, 0, Math.PI * 2);
     context.stroke();
+
+    context.save();
+
+    context.rotate(myIndex() * getPie());
+    const gradient = context.createRadialGradient(0, 0, 0, 0, 0, MAP_RADIUS);
+    gradient.addColorStop(0.9, "hsl(42deg 90% 50% / 0)");
+    gradient.addColorStop(0.97, "hsl(42deg 90% 50% / 0.05)");
+    gradient.addColorStop(1, "hsl(42deg 90% 50% / 0.1)");
+
+    context.beginPath();
+    context.arc(0, 0, MAP_RADIUS, 0, getPie());
+    context.fillStyle = gradient;
+    context.fill();
+    context.strokeStyle = "hsl(42deg 90% 50%)";
+    context.stroke();
+
+    context.strokeStyle = "hsl(42deg 90% 50% / 0.3)";
+    context.moveTo(MAP_RADIUS, 0);
+    context.lineTo(0, 0);
+    const theta = getPie();
+    context.lineTo(Math.cos(theta) * MAP_RADIUS, Math.sin(theta) * MAP_RADIUS);
+    context.stroke();
+
+    context.restore();
   }
   function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
     context.save();
-    const playersNum = world.players.length;
+    const pie = getPie();
 
-    const pie = Math.PI * 2 / playersNum
+    const a = pie * player.index;
+    const b = pie * (player.index + 1);
+    const theta = (b - a) * player.x + a;
 
-    context.rotate((player.index - 0.5 + player.x) * pie);
-
+    context.rotate(theta - Math.PI / 2);
 
     context.beginPath();
 
-    context.moveTo(-32, MAP_RADIUS - 16);
-    context.lineTo(32, MAP_RADIUS - 16);
+    context.fillStyle = "white";
+    context.strokeStyle = "black";
+    context.rect(-32, MAP_RADIUS - 32, 64, 32);
 
+    context.fill();
     context.stroke();
 
     context.restore();
@@ -104,13 +143,9 @@ function render() {
     context.translate(ball.x, ball.y);
 
     context.beginPath();
-    context.arc(0, 0, 8, 0, Math.PI * 2);
-    context.stroke();
-
-    context.beginPath();
-    context.strokeStyle = "red";
-    context.moveTo(0, 0);
-    context.lineTo(ball.vx * ball.speed, ball.vy * ball.speed);
+    context.arc(0, 0, ball.radius, 0, Math.PI * 2);
+    context.fillStyle = "white";
+    context.fill();
     context.stroke();
 
     context.restore();

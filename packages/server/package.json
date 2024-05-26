@@ -14,7 +14,8 @@
     "build": "bun build --entrypoints ./src/index.ts --outdir ./out --target bun --sourcemap=external --minify"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/matter-js": "^0.19.6"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -23,6 +24,7 @@
     "@elysiajs/cors": "^1.0.2",
     "@elysiajs/swagger": "^1.0.5",
     "elysia": "^1.0.22",
+    "matter-js": "^0.19.0",
     "utils": "workspace:^"
   }
 }

@@ -1,62 +1,64 @@
+import { Bodies, Body, Composite, Engine, Events, Pair } from "matter-js";
 import { clamp } from "utils";
 
 export class Player {
   readonly id: string;
+  readonly body: Body;
+  readonly game: Game;
+  index;
   #x = 0.5;
   get x() { return this.#x };
   set x(value: number) {
     this.#x = clamp(value, 0, 1);
+
+    // Do not set x value before the player pushed
+    const playerNum = this.game.players.length;
+    const pie = Math.PI * 2 / playerNum;
+    const a = pie * this.index;
+    const b = pie * (this.index + 1);
+    const theta = (b - a) * this.#x + a;
+
+    Body.setPosition(this.body, {
+      x: Math.cos(theta) * 16 * 19,
+      y: Math.sin(theta) * 16 * 19,
+    });
+    Body.setAngle(this.body, theta + Math.PI / 2);
   }
-  constructor(id: string) {
+  constructor(id: string, body: Body, index: number, game: Game) {
     this.id = id;
+    this.body = body;
+    this.index = index;
+    this.game = game;
   }
   serialize() {
     return {
       id: this.id,
       x: this.#x,
+      index: this.index,
     }
   }
 }
 
-interface BallOptions {
-  x: number,
-  y: number,
-  vx: number,
-  vy: number,
-  speed: number,
-}
 export class Ball {
   readonly id: string;
-  #x: number;
-  get x() { return this.#x };
-  #y: number;
-  get y() { return this.#y };
-  #vx: number;
-  get vx() { return this.#vx };
-  #vy: number;
-  get vy() { return this.#vy };
-  #speed: number;
-  get speed() { return this.#speed };
-  constructor(options: Partial<BallOptions>) {
+  readonly body: Body;
+  get x() { return this.body.position.x };
+  get y() { return this.body.position.y };
+  get vx() { return this.body.velocity.x };
+  get vy() { return this.body.velocity.y };
+  get radius() { return this.body.circleRadius! };
+  constructor(body: Body) {
     this.id = crypto.randomUUID();
-    this.#x = options.x ?? 0;
-    this.#y = options.y ?? 0;
-    this.#vx = options.vx ?? 1;
-    this.#vy = options.vy ?? 0;
-    this.#speed = options.speed ?? 100;
-  }
-  move(delta: number) {
-    this.#x += this.#vx * this.#speed * delta;
-    this.#y += this.#vy * this.#speed * delta;
+    this.body = body;
   }
   serialize() {
     return {
       id: this.id,
-      x: this.#x,
-      y: this.#y,
-      vx: this.#vx,
-      vy: this.#vy,
-      speed: this.#speed,
+      x: this.x,
+      y: this.y,
+      vx: this.vx,
+      vy: this.vy,
+      radius: this.radius,
     }
   }
 }
@@ -71,34 +73,98 @@ export class Game {
   players: Player[] = [];
   balls: Ball[] = [];
   state: GameState = GameState.Idle;
-  constructor() { }
+  physics;
+  constructor() {
+    this.physics = new Physics({
+      onBallOut: (body) => {
+        this.physics.remove(body);
+        this.balls = this.balls
+          .filter(ball => ball.body !== body)
+      },
+    });
+  }
   player(id: string) {
     return this.players.find(player => player.id === id);
   }
   addPlayer(id: string) {
-    this.players.push(new Player(id));
+    const body = this.physics.createPlayer();
+    const player = new Player(id, body, this.players.length, this);
+    this.players.push(player);
+    player.x = 0.5;
   }
   removePlayer(id: string) {
-    this.players = this.players.filter(player => player.id !== id);
+    const player = this.players.find(player => player.id === id);
+    if (player == null) return;
+    this.physics.remove(player.body);
+
+    this.players = this.players
+      .filter(player => player.id !== id)
+      .map((player, index) => {
+        player.index = index;
+        return player
+      });
   }
   ball(id: string) {
     return this.balls.find(ball => ball.id === id);
   }
-  addBall(options: Partial<BallOptions>) {
-    this.balls.push(new Ball(options));
+  addBall() {
+    const body = this.physics.createBall();
+    this.balls.push(new Ball(body));
   }
   update(delta: number) {
-    for (const ball of this.balls) {
-      ball.move(delta);
-    }
+    Engine.update(this.physics.engine, delta);
   }
   serialize() {
     return {
-      players: this.players.map((player, index) => ({
-        ...player.serialize(),
-        index,
-      })),
+      players: this.players.map(player => player.serialize()),
       balls: this.balls.map(ball => ball.serialize()),
     }
+  }
+}
+
+export class Physics {
+  engine = Engine.create({
+    gravity: { x: 0, y: 0 },
+  })
+  table = Bodies.circle(0, 0, 16 * 20, { isSensor: true, isStatic: true });
+  constructor(options?: { onBallOut?: (ball: Body) => void }) {
+    Composite.add(this.engine.world, [this.table]);
+    Events.on(this.engine, "collisionEnd", (e) => {
+      for (const pair of e.pairs) {
+        if (!pair.isSensor) continue;
+        const ball = getBall(this, pair);
+        if (ball == null) continue;
+
+        options?.onBallOut?.(ball);
+
+        function getBall(self: Physics, pair: Pair) {
+          if (pair.bodyA === self.table) return pair.bodyB;
+          if (pair.bodyB === self.table) return pair.bodyA;
+        }
+      }
+    });
+  }
+  createBall() {
+    const theta = Math.random() * 2 * Math.PI;
+    const ball = Bodies.circle(0, 0, 8, {
+      force: {
+        x: Math.cos(theta) * 4000,
+        y: Math.sin(theta) * 4000
+      },
+      restitution: 2,
+      frictionAir: 0.001,
+    });
+    Composite.add(this.engine.world, [ball]);
+    return ball;
+  }
+  remove(ball: Body) {
+    Composite.remove(this.engine.world, ball);
+  }
+  createPlayer() {
+    const player = Bodies.rectangle(0, 0, 64, 32, {
+      isStatic: true,
+    });
+    Composite.add(this.engine.world, [player]);
+    return player;
   }
 }
