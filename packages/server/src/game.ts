@@ -50,11 +50,6 @@ export class Ball {
     this.id = crypto.randomUUID();
     this.body = body;
   }
-  /**
-   * @deprecated
-   */
-  move(delta: number) {
-  }
   serialize() {
     return {
       id: this.id,
