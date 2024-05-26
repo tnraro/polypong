@@ -2,7 +2,6 @@ import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import Elysia, { t } from "elysia";
 import { GameManager } from "./game-manager";
-import staticPlugin from "@elysiajs/static";
 
 export const app = new Elysia()
   .use(cors())
@@ -40,9 +39,16 @@ export const app = new Elysia()
       ws.unsubscribe(ws.data.query.room);
     },
   })
-  .use(staticPlugin({
-    prefix: "/",
-  }))
+  .get("/*", async ({ set, params }) => {
+    const path = params["*"] ? params["*"] : "index.html";
+    const file = Bun.file(`public/${path}`);
+    if (!await file.exists()) {
+      set.status = "Not Found";
+      return;
+    }
+    set.headers["Content-Type"] = file.type;
+    return await file.text();
+  })
   .listen(8080)
 
 const gameManager = new GameManager(app.server!);
