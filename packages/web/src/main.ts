@@ -33,6 +33,13 @@ let world: World = {
   balls: [],
 };
 let me: string;
+function myIndex() {
+  return world.players.find(player => player.id === me)?.index ?? 0;
+}
+function getPie() {
+  const playersNum = world.players.length;
+  return Math.PI * 2 / playersNum;
+}
 ws.on("open", (e) => {
   console.log(e.type, e);
 });
@@ -63,6 +70,7 @@ function render() {
 
   context.save();
   context.translate($canvas.width / 2, $canvas.height / 2);
+  context.rotate(-(myIndex() + 0.5) * getPie() + Math.PI / 2);
 
   drawMap(context);
 
@@ -83,9 +91,7 @@ function render() {
   }
   function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
     context.save();
-    const playersNum = world.players.length;
-
-    const pie = Math.PI * 2 / playersNum;
+    const pie = getPie();
 
     const a = pie * player.index;
     const b = pie * (player.index + 1);
