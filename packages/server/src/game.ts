@@ -117,14 +117,14 @@ export class Physics {
     gravity: { x: 0, y: 0 },
   })
   table = Bodies.circle(0, 0, 16 * 20, { isSensor: true, isStatic: true });
-  constructor() {
+  constructor(options?: { onBallOut?: (ball: Body) => void }) {
     Events.on(this.engine, "collisionEnd", (e) => {
       for (const pair of e.pairs) {
         if (!pair.isSensor) continue;
         const ball = getBall(this, pair);
         if (ball == null) continue;
 
-        this.onBallOut(ball);
+        options?.onBallOut?.(ball);
 
         function getBall(self: Physics, pair: Pair) {
           if (pair.bodyA === self.table) return pair.bodyB;
@@ -146,14 +146,14 @@ export class Physics {
     Composite.add(this.engine.world, [ball]);
     return ball;
   }
+  removeBall(ball: Body) {
+    Composite.remove(this.engine.world, ball);
+  }
   createPlayer() {
     const player = Bodies.rectangle(0, 0, 64, 32, {
       isStatic: true,
     });
     Composite.add(this.engine.world, [player]);
     return player;
-  }
-  onBallOut(ball: Body) {
-    Composite.remove(this.engine.world, ball);
   }
 }
