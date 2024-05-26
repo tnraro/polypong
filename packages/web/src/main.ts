@@ -15,6 +15,7 @@ interface Player {
   id: string;
   x: number;
   index: number;
+  score: number;
 }
 interface Ball {
   x: number;
@@ -152,6 +153,14 @@ function render() {
   }
 }
 window.requestAnimationFrame(render);
+
+const $ui = document.querySelector<HTMLDivElement>("#ui")!;
+function renderUi() {
+  $ui.innerHTML = `<ul>${world.players.map(player => `<li>${player.id} — ${player.score}</li>`).join("")}</ui>`;
+
+  window.requestAnimationFrame(renderUi);
+}
+window.requestAnimationFrame(renderUi);
 
 function resize() {
   const rect = $canvas.getBoundingClientRect();
