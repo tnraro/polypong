@@ -24,6 +24,7 @@ export class Player {
     });
     Body.setAngle(this.body, theta + Math.PI / 2);
   }
+  score = 0;
   constructor(id: string, body: Body, index: number, game: Game) {
     this.id = id;
     this.body = body;
@@ -35,6 +36,7 @@ export class Player {
       id: this.id,
       x: this.#x,
       index: this.index,
+      score: this.score,
     }
   }
 }

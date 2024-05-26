@@ -7,7 +7,7 @@ describe("GameManager", () => {
     gameManager.add("r1", "p1");
     expect(gameManager.serialize())
       .toStrictEqual([
-        { id: "r1", game: { players: [{ id: "p1", index: 0, x: 0.5 }], balls: [] } }
+        { id: "r1", game: { players: [{ id: "p1", index: 0, x: 0.5, score: 0, }], balls: [] } }
       ]);
   });
   test("remove — 1", () => {
@@ -21,8 +21,8 @@ describe("GameManager", () => {
         {
           id: "r1", game: {
             players: [
-              { id: "p1", index: 0, x: 0.5 },
-              { id: "p2", index: 1, x: 0.5 }
+              { id: "p1", index: 0, x: 0.5, score: 0, },
+              { id: "p2", index: 1, x: 0.5, score: 0, }
             ], balls: []
           }
         },
@@ -36,8 +36,8 @@ describe("GameManager", () => {
     gameManager.remove("r1", "p2");
     expect(gameManager.serialize())
       .toStrictEqual([
-        { id: "r1", game: { players: [{ id: "p1", index: 0, x: 0.5 }], balls: [] } },
-        { id: "r2", game: { players: [{ id: "p3", index: 0, x: 0.5 }], balls: [] } },
+        { id: "r1", game: { players: [{ id: "p1", index: 0, x: 0.5, score: 0, }], balls: [] } },
+        { id: "r2", game: { players: [{ id: "p3", index: 0, x: 0.5, score: 0, }], balls: [] } },
       ]);
   });
   test("remove — 3", () => {

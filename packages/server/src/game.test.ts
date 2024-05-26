@@ -9,6 +9,7 @@ describe("Game", () => {
       id: "p1",
       x: 0.5,
       index: 0,
+      score: 0,
     });
     expect(game.serialize()).toStrictEqual({
       players: [
@@ -16,6 +17,7 @@ describe("Game", () => {
           id: "p1",
           x: 0.5,
           index: 0,
+          score: 0,
         }
       ],
       balls: [],
