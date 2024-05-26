@@ -1,3 +1,4 @@
+import { Bodies, Body, Composite, Engine, Events, Pair } from "matter-js";
 import { clamp } from "utils";
 
 export class Player {
@@ -100,5 +101,51 @@ export class Game {
       })),
       balls: this.balls.map(ball => ball.serialize()),
     }
+  }
+}
+
+export class Physics {
+  engine = Engine.create({
+    gravity: { x: 0, y: 0 },
+  })
+  table = Bodies.circle(0, 0, 16 * 20, { isSensor: true, isStatic: true });
+  constructor() {
+    Events.on(this.engine, "collisionEnd", (e) => {
+      for (const pair of e.pairs) {
+        if (!pair.isSensor) continue;
+        const ball = getBall(this, pair);
+        if (ball == null) continue;
+
+        this.onBallOut(ball);
+
+        function getBall(self: Physics, pair: Pair) {
+          if (pair.bodyA === self.table) return pair.bodyB;
+          if (pair.bodyB === self.table) return pair.bodyA;
+        }
+      }
+    });
+  }
+  createBall() {
+    const theta = Math.random() * 2 * Math.PI;
+    const ball = Bodies.circle(0, 0, 8, {
+      force: {
+        x: Math.cos(theta) * 0.004,
+        y: Math.sin(theta) * 0.004
+      },
+      restitution: 2,
+      frictionAir: 0.001,
+    });
+    Composite.add(this.engine.world, [ball]);
+    return ball;
+  }
+  createPlayer() {
+    const player = Bodies.rectangle(0, 0, 64, 32, {
+      isStatic: true,
+    });
+    Composite.add(this.engine.world, [player]);
+    return player;
+  }
+  onBallOut(ball: Body) {
+    Composite.remove(this.engine.world, ball);
   }
 }
