@@ -2,6 +2,7 @@ import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import Elysia, { t } from "elysia";
 import { GameManager } from "./game-manager";
+import staticPlugin from "@elysiajs/static";
 
 export const app = new Elysia()
   .use(cors())
@@ -39,7 +40,9 @@ export const app = new Elysia()
       ws.unsubscribe(ws.data.query.room);
     },
   })
-  .get("/", () => 53)
+  .use(staticPlugin({
+    prefix: "/",
+  }))
   .listen(8080)
 
 const gameManager = new GameManager(app.server!);

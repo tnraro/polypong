@@ -253,6 +253,4 @@ async function run(options: { nickname: string }) {
   window.addEventListener("mousedown", () => { isDown = true; });
   window.addEventListener("mouseup", () => { isDown = false; });
   window.addEventListener("mousemove", input);
-
-  document.querySelector("#ui")!.innerHTML = (await client.index.get()).data + "";
 }
