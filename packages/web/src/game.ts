@@ -20,6 +20,7 @@ export interface Ball {
   pos: { x: number, y: number };
   vel: { x: number, y: number };
   speed: number;
+  radius: number;
 }
 
 export interface IntrinsicEvent {
@@ -110,6 +111,7 @@ function createBall(index: number): Ball {
     speed: 100,
     vel: {
       x: 0, y: 1,
-    }
+    },
+    radius: 8,
   }
 }
