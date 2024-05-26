@@ -85,9 +85,13 @@ function render() {
     context.save();
     const playersNum = world.players.length;
 
-    const pie = Math.PI * 2 / playersNum
+    const pie = Math.PI * 2 / playersNum;
 
-    context.rotate((player.index - 0.5 + player.x) * pie + Math.PI / 2);
+    const a = pie * player.index;
+    const b = pie * (player.index + 1);
+    const theta = (b - a) * player.x + a;
+
+    context.rotate(theta - Math.PI / 2);
 
     context.beginPath();
 
