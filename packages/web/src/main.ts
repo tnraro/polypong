@@ -1,106 +1,92 @@
+import { Bodies, Body, Composite, Engine, Events, Pair, Render, Runner } from "matter-js";
 import { clamp } from "utils";
-import "./style.css";
-import { type Ball, Game, type Player } from "./game";
 
 const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 
-const game = new Game();
+const engine = Engine.create({
+  gravity: { x: 0, y: 0 },
 
-game.emit({
-  type: "playerEnter",
-  id: "p1"
 });
 
-game.emit({
-  type: "start",
+const render = Render.create({
+  canvas: $canvas,
+  engine,
+  options: {
+    width: 480,
+    height: 720,
+    showAngleIndicator: true,
+    showVelocity: true,
+  }
+});
+Render.lookAt(render, {
+  min: { x: -240, y: -360 },
+  max: { x: 240, y: 360 },
 });
 
+const table = Bodies.circle(0, 0, 16 * 20, { isStatic: true, isSensor: true });
 
-let t = performance.now();
+Events.on(engine, "collisionEnd", (e) => {
+  for (const pair of e.pairs) {
+    if (!pair.isSensor) continue;
+    const ball = getBall(pair);
+    if (ball == null) continue;
+
+    Composite.remove(engine.world, ball);
+    console.log(ball);
+    Composite.add(engine.world, [createBall()]);
+
+    function getBall(pair: Pair) {
+      if (pair.bodyA === table) return pair.bodyB;
+      if (pair.bodyB === table) return pair.bodyA;
+    }
+  }
+})
+
+function createBall() {
+  const theta = Math.random() * 2 * Math.PI;
+  const ball = Bodies.circle(0, 0, 8, {
+    force: {
+      x: Math.cos(theta) * 0.004,
+      y: Math.sin(theta) * 0.004
+    },
+    restitution: 1,
+    frictionAir: 0,
+  });
+  return ball;
+}
+
+const player = Bodies.rectangle(0, 0, 64, 32, {
+  isStatic: true,
+});
+Composite.add(engine.world, [player]);
+
+Composite.add(engine.world, [table]);
+
 setInterval(() => {
-  game.update((performance.now() - t) / 1000);
-  t = performance.now();
-}, 1000 / 60);
+  Composite.add(engine.world, [createBall()]);
+}, 1000);
 
-function render() {
-  const context = $canvas?.getContext("2d");
-  if (context == null) return;
+Render.run(render);
 
-  context.clearRect(0, 0, $canvas.width, $canvas.height);
+const runner = Runner.create();
 
-  context.save();
-  context.translate($canvas.width / 2, $canvas.height / 2);
-
-  drawMap(context);
-
-  for (const player of game.players) {
-    drawPlayer(context, player);
-  }
-  for (const ball of game.balls) {
-    drawBall(context, ball);
-  }
-
-  context.restore();
-  window.requestAnimationFrame(render);
-
-  function drawMap(context: CanvasRenderingContext2D) {
-    context.beginPath();
-    context.arc(0, 0, game.map.radius, 0, Math.PI * 2);
-    context.stroke();
-  }
-  function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
-    context.save();
-    const playersNum = game.players.length;
-
-    const pie = Math.PI * 2 / playersNum
-
-    context.rotate((player.index - 0.5 + player.x) * pie);
-
-
-    context.beginPath();
-
-    context.moveTo(-32, game.map.radius - 16);
-    context.lineTo(32, game.map.radius - 16);
-
-    context.stroke();
-
-    context.restore();
-  }
-  function drawBall(context: CanvasRenderingContext2D, ball: Ball) {
-    context.save();
-    context.translate(ball.pos.x, ball.pos.y);
-
-    context.beginPath();
-    context.arc(0, 0, ball.radius, 0, Math.PI * 2);
-    context.stroke();
-
-    context.beginPath();
-    context.strokeStyle = "red";
-    context.moveTo(0, 0);
-    context.lineTo(ball.vel.x * ball.speed, ball.vel.y * ball.speed);
-    context.stroke();
-
-    context.restore();
-  }
-}
-window.requestAnimationFrame(render);
-
-function resize() {
-  const rect = $canvas.getBoundingClientRect();
-
-  $canvas.width = Math.floor(rect.width);
-  $canvas.height = Math.floor(rect.height);
-}
-resize();
-window.addEventListener("resize", resize);
+Runner.run(runner, engine);
 
 function input(e: MouseEvent) {
-  const x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
-  game.emit({
-    type: "playerMove",
-    id: "p1",
-    value: x,
-  })
+  const nx = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
+
+  const playerNum = 3;
+  const index = 0;
+  const pie = Math.PI * 2 / playerNum;
+  const a = pie * index;
+  const b = pie * (index + 1);
+  const theta = (b - a) * nx + a;
+
+  Body.setPosition(player, {
+    x: Math.cos(theta) * 16 * 19,
+    y: Math.sin(theta) * 16 * 19,
+  });
+  Body.setAngle(player, theta + Math.PI / 2);
 }
 
 window.addEventListener("mousemove", input);
