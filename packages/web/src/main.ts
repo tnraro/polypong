@@ -8,6 +8,7 @@ const client = treaty<App>(import.meta.env.VITE_API_ENTRYPOINT);
 const ws = client.ws.subscribe({
   query: {
     room: "53",
+    name: "임시 이름",
   }
 });
 
@@ -16,6 +17,7 @@ interface Player {
   x: number;
   index: number;
   score: number;
+  name: string;
 }
 interface Ball {
   x: number;
@@ -139,7 +141,7 @@ function render() {
 
     context.textAlign = "center";
     context.fillStyle = "black";
-    context.fillText(player.id, 0, MAP_RADIUS + 16);
+    context.fillText(player.name, 0, MAP_RADIUS + 16);
 
     context.restore();
   }
@@ -160,7 +162,7 @@ window.requestAnimationFrame(render);
 
 const $ui = document.querySelector<HTMLDivElement>("#ui")!;
 function renderUi() {
-  $ui.innerHTML = `<ul>${world.players.map(player => `<li>${player.id} — ${player.score}</li>`).join("")}</ui>`;
+  $ui.innerHTML = `<ul>${world.players.map(player => `<li>${player.name} — ${player.score}</li>`).join("")}</ui>`;
 
   window.requestAnimationFrame(renderUi);
 }
