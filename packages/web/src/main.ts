@@ -21,7 +21,6 @@ setInterval(() => {
   game.update((performance.now() - t) / 1000);
 }, 1000 / 60);
 
-const MAP_RADIUS = 16 * 20;
 function render() {
   const context = $canvas?.getContext("2d");
   if (context == null) return;
@@ -45,7 +44,7 @@ function render() {
 
   function drawMap(context: CanvasRenderingContext2D) {
     context.beginPath();
-    context.arc(0, 0, MAP_RADIUS, 0, Math.PI * 2);
+    context.arc(0, 0, game.map.radius, 0, Math.PI * 2);
     context.stroke();
   }
   function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
@@ -59,8 +58,8 @@ function render() {
 
     context.beginPath();
 
-    context.moveTo(-32, MAP_RADIUS - 16);
-    context.lineTo(32, MAP_RADIUS - 16);
+    context.moveTo(-32, game.map.radius - 16);
+    context.lineTo(32, game.map.radius - 16);
 
     context.stroke();
 
