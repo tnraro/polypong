@@ -127,7 +127,7 @@ export class Physics {
     gravity: { x: 0, y: 0 },
   })
   table = Bodies.circle(0, 0, 16 * 20, { isSensor: true, isStatic: true });
-  constructor(options?: { onBallOut?: (ball: Body) => void }) {
+  constructor(options?: { onBallOut?: (ball: Body) => void, onBallHit?: (ball: Body, player: Body) => void }) {
     Composite.add(this.engine.world, [this.table]);
     Events.on(this.engine, "collisionEnd", (e) => {
       for (const pair of e.pairs) {
@@ -143,6 +143,27 @@ export class Physics {
         }
       }
     });
+    Events.on(this.engine, "collisionStart", (e) => {
+      for (const pair of e.pairs) {
+        if (pair.isSensor || pair.bodyA.label === pair.bodyB.label) continue;
+
+        const ball = getBall(pair);
+        const player = getPlayer(pair);
+
+        if (ball == null || player == null) continue;
+
+        options?.onBallHit?.(ball, player);
+
+        function getBall(pair: Pair) {
+          if (pair.bodyA.label === "ball") return pair.bodyA;
+          if (pair.bodyB.label === "ball") return pair.bodyB;
+        }
+        function getPlayer(pair: Pair) {
+          if (pair.bodyA.label === "player") return pair.bodyA;
+          if (pair.bodyB.label === "player") return pair.bodyB;
+        }
+      }
+    })
   }
   createBall() {
     const theta = Math.random() * 2 * Math.PI;
