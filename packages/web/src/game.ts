@@ -50,7 +50,9 @@ export class Game {
   }
   #onStart() {
     if (this.state !== GameState.Lobby) throw new Error("state must be lobby", { cause: this.state });
-    this.reset();
+    this.balls = [
+      createBall(0),
+    ];
     this.state = GameState.Playing;
   }
   #onEnd() {
@@ -74,6 +76,11 @@ export class Game {
   }
   update(delta: number) {
     if (this.state !== GameState.Playing) return;
+
+    for (const ball of this.balls) {
+      ball.pos.x += ball.vel.x * ball.speed * delta;
+      ball.pos.y += ball.vel.y * ball.speed * delta;
+    }
   }
 }
 
