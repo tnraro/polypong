@@ -153,6 +153,7 @@ export class Physics {
       },
       restitution: 2,
       frictionAir: 0.001,
+      label: "ball",
     });
     Composite.add(this.engine.world, [ball]);
     return ball;
@@ -163,6 +164,7 @@ export class Physics {
   createPlayer() {
     const player = Bodies.rectangle(0, 0, 64, 32, {
       isStatic: true,
+      label: "player",
     });
     Composite.add(this.engine.world, [player]);
     return player;
