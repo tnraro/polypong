@@ -23,11 +23,11 @@ export interface Ball {
 }
 
 export interface IntrinsicEvent {
-  start: Record<string, never>;
-  end: Record<string, never>;
-  back: Record<string, never>;
-  playerEnter: { id: string };
-  playerLeave: { id: string };
+  start: { type: "start" };
+  end: { type: "end" };
+  back: { type: "back" };
+  playerEnter: { type: "playerEnter", id: string };
+  playerLeave: { type: "playerLeave", id: string };
 }
 
 export class Game {
@@ -35,7 +35,7 @@ export class Game {
   players: Player[] = [];
   spectators: User[] = [];
   balls: Ball[] = [];
-  emit<Type extends keyof IntrinsicEvent>(event: { type: Type } & IntrinsicEvent[Type]) {
+  emit<Type extends keyof IntrinsicEvent>(event: IntrinsicEvent[Type]) {
     try {
       switch (event.type) {
         case "start": return this.#onStart();
@@ -49,24 +49,24 @@ export class Game {
     }
   }
   #onStart() {
-    if (this.state !== GameState.Lobby) throw new Error("state must be lobby", { cause: this.state });
+    if (this.state !== GameState.Lobby) throw new Error("state must be lobby");
     this.balls = [
       createBall(0),
     ];
     this.state = GameState.Playing;
   }
   #onEnd() {
-    if (this.state !== GameState.Playing) throw new Error("state must be playing", { cause: this.state });
+    if (this.state !== GameState.Playing) throw new Error("state must be playing");
     this.state = GameState.Result;
   }
   #onBack() {
-    if (this.state !== GameState.Result) throw new Error("state must be result", { cause: this.state });
+    if (this.state !== GameState.Result) throw new Error("state must be result");
     this.state = GameState.Lobby;
   }
   #onPlayerEnter(event: IntrinsicEvent["playerEnter"]) {
     this.players.push(createPlayer(event.id, this.players.length));
   }
-  #onPlayerLeave(event: IntrinsicEvent["playerEnter"]) {
+  #onPlayerLeave(event: IntrinsicEvent["playerLeave"]) {
     this.players = this.players
       .filter(player => player.id !== event.id)
       .map((player, index) => ({
