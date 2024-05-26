@@ -9,7 +9,11 @@ export class GameManager {
     this.#server = server;
   }
   add(roomId: string, playerId: string, name: string) {
-    const game = this.#games.get(roomId) ?? new Game();
+    const game = this.#games.get(roomId) ?? new Game({
+      onBallOut: (event) => {
+        this.pub(roomId, event, true);
+      },
+    });
     game.addPlayer(playerId, name);
     this.#games.set(roomId, game);
   }
