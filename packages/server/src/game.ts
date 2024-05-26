@@ -4,16 +4,18 @@ import { clamp } from "utils";
 export class Player {
   readonly id: string;
   readonly body: Body;
+  readonly game: Game;
   index;
   #x = 0.5;
   get x() { return this.#x };
   set x(value: number) {
     this.#x = clamp(value, 0, 1);
   }
-  constructor(id: string, body: Body, index: number) {
+  constructor(id: string, body: Body, index: number, game: Game) {
     this.id = id;
     this.body = body;
     this.index = index;
+    this.game = game;
   }
   serialize() {
     return {
@@ -84,7 +86,7 @@ export class Game {
   }
   addPlayer(id: string) {
     const body = this.physics.createPlayer();
-    this.players.push(new Player(id, body, this.players.length));
+    this.players.push(new Player(id, body, this.players.length, this));
   }
   removePlayer(id: string) {
     this.players = this.players
