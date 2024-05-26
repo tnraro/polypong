@@ -80,12 +80,17 @@ export class Game {
   balls: Ball[] = [];
   state: GameState = GameState.Idle;
   physics;
-  constructor() {
+  constructor(options?: { onBallOut: (event: { type: "ballOut", index: number }) => void }) {
     this.physics = new Physics({
       onBallOut: (body) => {
         const theta = (Math.atan2(body.position.y, body.position.x) + Math.PI * 2) % (Math.PI * 2);
         const pie = Math.PI * 2 / this.players.length;
         const index = Math.floor(theta / pie);
+
+        options?.onBallOut?.({
+          type: "ballOut",
+          index,
+        });
 
         const ball = this.balls.find(ball => ball.body === body);
         if (ball != null) {
