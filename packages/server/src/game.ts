@@ -108,9 +108,7 @@ export class Game {
     this.balls.push(new Ball(body));
   }
   update(delta: number) {
-    for (const ball of this.balls) {
-      ball.move(delta);
-    }
+    Engine.update(this.physics.engine, delta);
   }
   serialize() {
     return {
