@@ -1,58 +1,10 @@
-import { treaty } from "@elysiajs/eden";
-import type { App } from "server";
-import "./style.css";
 import { clamp } from "utils";
-
-const client = treaty<App>(import.meta.env.VITE_API_ENTRYPOINT);
-
-const ws = client.ws.subscribe({
-  query: {
-    room: "53",
-  }
-});
-
-interface Player {
-  id: string;
-  x: number;
-  index: number;
-}
-interface Ball {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  speed: number;
-}
-interface World {
-  players: Player[];
-  balls: Ball[];
-}
-
-let world: World = {
-  players: [],
-  balls: [],
-};
-let me: string;
-ws.on("open", (e) => {
-  console.log(e.type, e);
-});
-ws.subscribe((message) => {
-  const data: any = message.data;
-  if (data.type === "snapshot") {
-    world = data.world;
-  }
-  if (data.type === "me:enter") {
-    me = data.id;
-  }
-});
-ws.on("error", (e) => {
-  console.error(e.type, e)
-});
-ws.on("close", (e) => {
-  console.log(e.type, e)
-});
+import "./style.css";
+import { type Ball, Game, type Player } from "./game";
 
 const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
+
+const game = new Game();
 
 const MAP_RADIUS = 16 * 20;
 function render() {
@@ -66,10 +18,10 @@ function render() {
 
   drawMap(context);
 
-  for (const player of world.players) {
+  for (const player of game.players) {
     drawPlayer(context, player);
   }
-  for (const ball of world.balls) {
+  for (const ball of game.balls) {
     drawBall(context, ball);
   }
 
@@ -83,7 +35,7 @@ function render() {
   }
   function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
     context.save();
-    const playersNum = world.players.length;
+    const playersNum = game.players.length;
 
     const pie = Math.PI * 2 / playersNum
 
@@ -101,7 +53,7 @@ function render() {
   }
   function drawBall(context: CanvasRenderingContext2D, ball: Ball) {
     context.save();
-    context.translate(ball.x, ball.y);
+    context.translate(ball.pos.x, ball.pos.y);
 
     context.beginPath();
     context.arc(0, 0, 8, 0, Math.PI * 2);
@@ -110,7 +62,7 @@ function render() {
     context.beginPath();
     context.strokeStyle = "red";
     context.moveTo(0, 0);
-    context.lineTo(ball.vx * ball.speed, ball.vy * ball.speed);
+    context.lineTo(ball.vel.x * ball.speed, ball.vel.y * ball.speed);
     context.stroke();
 
     context.restore();
@@ -129,13 +81,6 @@ window.addEventListener("resize", resize);
 
 function input(e: MouseEvent) {
   const x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
-
-  ws.send({
-    type: "x",
-    value: x,
-  });
 }
 
 window.addEventListener("mousemove", input);
-
-document.querySelector("#ui")!.innerHTML = (await client.index.get()).data + "";
