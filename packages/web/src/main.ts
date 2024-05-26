@@ -88,6 +88,30 @@ function render() {
     context.beginPath();
     context.arc(0, 0, MAP_RADIUS, 0, Math.PI * 2);
     context.stroke();
+
+    context.save();
+
+    context.rotate(myIndex() * getPie());
+    const gradient = context.createRadialGradient(0, 0, 0, 0, 0, MAP_RADIUS);
+    gradient.addColorStop(0.9, "hsl(42deg 90% 50% / 0)");
+    gradient.addColorStop(0.97, "hsl(42deg 90% 50% / 0.05)");
+    gradient.addColorStop(1, "hsl(42deg 90% 50% / 0.1)");
+
+    context.beginPath();
+    context.arc(0, 0, MAP_RADIUS, 0, getPie());
+    context.fillStyle = gradient;
+    context.fill();
+    context.strokeStyle = "hsl(42deg 90% 50%)";
+    context.stroke();
+
+    context.strokeStyle = "hsl(42deg 90% 50% / 0.3)";
+    context.moveTo(MAP_RADIUS, 0);
+    context.lineTo(0, 0);
+    const theta = getPie();
+    context.lineTo(Math.cos(theta) * MAP_RADIUS, Math.sin(theta) * MAP_RADIUS);
+    context.stroke();
+
+    context.restore();
   }
   function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
     context.save();
