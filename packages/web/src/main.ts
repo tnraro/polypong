@@ -31,7 +31,7 @@ function lobby() {
 }
 
 async function run(options: { nickname: string }) {
-  const client = treaty<App>(import.meta.env.VITE_API_ENTRYPOINT);
+  const client = treaty<App>(import.meta.env.PROD ? location.host : import.meta.env.VITE_API_ENTRYPOINT);
 
   const ws = client.ws.subscribe({
     query: {
