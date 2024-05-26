@@ -67,6 +67,10 @@ function render() {
   if (context == null) return;
 
   context.clearRect(0, 0, $canvas.width, $canvas.height);
+  context.save();
+  context.fillStyle = "gainsboro";
+  context.fillRect(0, 0, $canvas.width, $canvas.height);
+  context.restore();
 
   context.save();
   context.translate($canvas.width / 2, $canvas.height / 2);
