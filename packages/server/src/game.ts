@@ -10,6 +10,18 @@ export class Player {
   get x() { return this.#x };
   set x(value: number) {
     this.#x = clamp(value, 0, 1);
+
+    const playerNum = this.game.players.length;
+    const pie = Math.PI * 2 / playerNum;
+    const a = pie * this.index;
+    const b = pie * (this.index + 1);
+    const theta = (b - a) * this.#x + a;
+
+    Body.setPosition(this.body, {
+      x: Math.cos(theta) * 16 * 19,
+      y: Math.sin(theta) * 16 * 19,
+    });
+    Body.setAngle(this.body, theta + Math.PI / 2);
   }
   constructor(id: string, body: Body, index: number, game: Game) {
     this.id = id;
