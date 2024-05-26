@@ -80,6 +80,22 @@ export class Game {
   constructor() {
     this.physics = new Physics({
       onBallOut: (body) => {
+        const theta = (Math.atan2(body.position.y, body.position.x) + Math.PI * 2) % (Math.PI * 2);
+        const pie = Math.PI * 2 / this.players.length;
+        const index = Math.floor(theta / pie);
+
+        const ball = this.balls.find(ball => ball.body === body);
+        if (ball != null) {
+          if (ball.lastHitPlayerId != null) {
+            const player = this.players.find(player => player.index !== index && player.id === ball.lastHitPlayerId);
+            if (player != null) player.score += 1;
+          } else {
+            this.players
+              .filter(player => player.index !== index)
+              .forEach(player => player.score += 1);
+          }
+        }
+
         this.physics.remove(body);
         this.balls = this.balls
           .filter(ball => ball.body !== body)
