@@ -47,6 +47,7 @@ export class Ball {
   get vx() { return this.body.velocity.x };
   get vy() { return this.body.velocity.y };
   get radius() { return this.body.circleRadius! };
+  lastHitPlayerId: string | undefined;
   constructor(body: Body) {
     this.id = crypto.randomUUID();
     this.body = body;
@@ -81,6 +82,14 @@ export class Game {
         this.balls = this.balls
           .filter(ball => ball.body !== body)
       },
+      onBallHit: (ballBody, playerBody) => {
+        const ball = this.balls.find(ball => ball.body === ballBody);
+        const player = this.players.find(player => player.body === playerBody);
+
+        if (ball == null || player == null) return;
+
+        ball.lastHitPlayerId = player.id;
+      }
     });
   }
   player(id: string) {
