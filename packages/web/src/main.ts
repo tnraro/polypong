@@ -6,6 +6,15 @@ const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 
 const game = new Game();
 
+game.emit({
+  type: "start",
+})
+
+let t = performance.now();
+setInterval(() => {
+  game.update((performance.now() - t) / 1000);
+}, 1000 / 60);
+
 const MAP_RADIUS = 16 * 20;
 function render() {
   const context = $canvas?.getContext("2d");
