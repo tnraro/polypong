@@ -77,7 +77,7 @@ export class Game {
   constructor() {
     this.physics = new Physics({
       onBallOut: (body) => {
-        this.physics.removeBall(body);
+        this.physics.remove(body);
         this.balls = this.balls
           .filter(ball => ball.body !== body)
       },
@@ -91,6 +91,10 @@ export class Game {
     this.players.push(new Player(id, body, this.players.length, this));
   }
   removePlayer(id: string) {
+    const player = this.players.find(player => player.id === id);
+    if (player == null) return;
+    this.physics.remove(player.body);
+
     this.players = this.players
       .filter(player => player.id !== id)
       .map((player, index) => {
@@ -151,7 +155,7 @@ export class Physics {
     Composite.add(this.engine.world, [ball]);
     return ball;
   }
-  removeBall(ball: Body) {
+  remove(ball: Body) {
     Composite.remove(this.engine.world, ball);
   }
   createPlayer() {
