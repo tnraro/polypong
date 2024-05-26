@@ -28,6 +28,7 @@ export interface IntrinsicEvent {
   back: { type: "back" };
   playerEnter: { type: "playerEnter", id: string };
   playerLeave: { type: "playerLeave", id: string };
+  playerMove: { type: "playerMove", id: string, value: number };
 }
 
 export class Game {
@@ -43,6 +44,7 @@ export class Game {
         case "back": return this.#onBack();
         case "playerEnter": return this.#onPlayerEnter(event);
         case "playerLeave": return this.#onPlayerLeave(event);
+        case "playerMove": return this.#onPlayerMove(event);
       }
     } catch (error) {
       console.error(error);
@@ -73,6 +75,11 @@ export class Game {
         ...player,
         index,
       }));
+  }
+  #onPlayerMove(event: IntrinsicEvent["playerMove"]) {
+    const player = this.players.find(player => player.id === event.id);
+    if (player == null) return;
+    player.x = event.value;
   }
   update(delta: number) {
     if (this.state !== GameState.Playing) return;

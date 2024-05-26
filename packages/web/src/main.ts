@@ -7,8 +7,14 @@ const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 const game = new Game();
 
 game.emit({
+  type: "playerEnter",
+  id: "p1"
+});
+
+game.emit({
   type: "start",
-})
+});
+
 
 let t = performance.now();
 setInterval(() => {
@@ -90,6 +96,11 @@ window.addEventListener("resize", resize);
 
 function input(e: MouseEvent) {
   const x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
+  game.emit({
+    type: "playerMove",
+    id: "p1",
+    value: x,
+  })
 }
 
 window.addEventListener("mousemove", input);
