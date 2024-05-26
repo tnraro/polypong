@@ -102,7 +102,9 @@ export class Game {
 
         this.physics.remove(body);
         this.balls = this.balls
-          .filter(ball => ball.body !== body)
+          .filter(ball => ball.body !== body);
+
+        setTimeout(() => this.addBall(), 500);
       },
       onBallHit: (ballBody, playerBody) => {
         const ball = this.balls.find(ball => ball.body === ballBody);
@@ -113,6 +115,8 @@ export class Game {
         ball.lastHitPlayerId = player.id;
       }
     });
+
+    setTimeout(() => this.addBall(), 500);
   }
   player(id: string) {
     return this.players.find(player => player.id === id);
