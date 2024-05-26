@@ -112,6 +112,7 @@ function createPlayer(id: string, index: number): Player {
 }
 
 function createBall(index: number): Ball {
+  const theta = Math.random() * 2 * Math.PI;
   return {
     id: String(index),
     pos: {
@@ -119,7 +120,8 @@ function createBall(index: number): Ball {
     },
     speed: 100,
     vel: {
-      x: 0, y: 1,
+      x: Math.cos(theta),
+      y: Math.sin(theta),
     },
     radius: 8,
   }
