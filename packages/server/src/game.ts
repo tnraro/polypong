@@ -38,14 +38,6 @@ export class Player {
   }
 }
 
-interface BallOptions {
-  x: number,
-  y: number,
-  vx: number,
-  vy: number,
-  speed: number,
-  body: Body;
-}
 export class Ball {
   readonly id: string;
   readonly body: Body;
