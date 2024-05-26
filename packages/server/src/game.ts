@@ -210,7 +210,7 @@ export class Physics {
         x: Math.cos(theta) * 4000,
         y: Math.sin(theta) * 4000
       },
-      restitution: 2,
+      restitution: 1.2,
       frictionAir: 0.001,
       label: "ball",
     });
