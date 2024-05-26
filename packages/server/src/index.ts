@@ -29,11 +29,11 @@ export const app = new Elysia()
       gameManager.ws = ws;
       ws.subscribe(ws.data.query.room);
       gameManager.add(ws.data.query.room, ws.id);
-      app.server?.publish(ws.data.query.room, JSON.stringify({ type: "player:enter", id: ws.id }), true);
+      app.server?.publish(ws.data.query.room, JSON.stringify({ type: "playerEnter", id: ws.id }), true);
       ws.send({ type: "me:enter", id: ws.id });
     },
     close(ws) {
-      app.server?.publish(ws.data.query.room, JSON.stringify({ type: "player:leave", id: ws.id }), true);
+      app.server?.publish(ws.data.query.room, JSON.stringify({ type: "playerLeave", id: ws.id }), true);
       gameManager.remove(ws.data.query.room, ws.id);
       ws.unsubscribe(ws.data.query.room);
     },
