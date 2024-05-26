@@ -37,6 +37,7 @@ export class Game {
   players: Player[] = [];
   spectators: User[] = [];
   balls: Ball[] = [];
+  map = { radius: 16 * 20 };
   emit<Type extends keyof IntrinsicEvent>(event: IntrinsicEvent[Type]) {
     try {
       switch (event.type) {
