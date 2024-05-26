@@ -137,6 +137,10 @@ function render() {
     context.fill();
     context.stroke();
 
+    context.textAlign = "center";
+    context.fillStyle = "black";
+    context.fillText(player.id, 0, MAP_RADIUS + 16);
+
     context.restore();
   }
   function drawBall(context: CanvasRenderingContext2D, ball: Ball) {
