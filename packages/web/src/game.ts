@@ -1,3 +1,5 @@
+import { Vec } from "utils";
+
 export enum GameState {
   Lobby,
   Playing,
@@ -89,6 +91,12 @@ export class Game {
     for (const ball of this.balls) {
       ball.pos.x += ball.vel.x * ball.speed * delta;
       ball.pos.y += ball.vel.y * ball.speed * delta;
+    }
+    for (const ball of this.balls) {
+      if (Vec.zero.distanceTo(ball.pos) - ball.radius > this.map.radius) {
+        ball.vel.x *= -1;
+        ball.vel.y *= -1;
+      }
     }
   }
 }
