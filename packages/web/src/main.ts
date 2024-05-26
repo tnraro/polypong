@@ -129,8 +129,11 @@ function render() {
 
     context.beginPath();
 
-    context.fillRect(-32, MAP_RADIUS - 32, 64, 32);
+    context.fillStyle = "white";
+    context.strokeStyle = "black";
+    context.rect(-32, MAP_RADIUS - 32, 64, 32);
 
+    context.fill();
     context.stroke();
 
     context.restore();
