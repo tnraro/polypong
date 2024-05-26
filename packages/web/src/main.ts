@@ -49,8 +49,8 @@ function createBall() {
       x: Math.cos(theta) * 0.004,
       y: Math.sin(theta) * 0.004
     },
-    restitution: 1,
-    frictionAir: 0,
+    restitution: 2,
+    frictionAir: 0.001,
   });
   return ball;
 }
