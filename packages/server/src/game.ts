@@ -11,6 +11,7 @@ export class Player {
   set x(value: number) {
     this.#x = clamp(value, 0, 1);
 
+    // Do not set x value before the player pushed
     const playerNum = this.game.players.length;
     const pie = Math.PI * 2 / playerNum;
     const a = pie * this.index;
@@ -28,7 +29,6 @@ export class Player {
     this.body = body;
     this.index = index;
     this.game = game;
-    this.x = 0.5;
   }
   serialize() {
     return {
@@ -88,7 +88,9 @@ export class Game {
   }
   addPlayer(id: string) {
     const body = this.physics.createPlayer();
-    this.players.push(new Player(id, body, this.players.length, this));
+    const player = new Player(id, body, this.players.length, this);
+    this.players.push(player);
+    player.x = 0.5;
   }
   removePlayer(id: string) {
     const player = this.players.find(player => player.id === id);
