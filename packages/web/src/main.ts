@@ -19,6 +19,7 @@ game.emit({
 let t = performance.now();
 setInterval(() => {
   game.update((performance.now() - t) / 1000);
+  t = performance.now();
 }, 1000 / 60);
 
 function render() {
