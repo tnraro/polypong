@@ -3,13 +3,15 @@ import { clamp } from "utils";
 
 export class Player {
   readonly id: string;
+  readonly body: Body;
   #x = 0.5;
   get x() { return this.#x };
   set x(value: number) {
     this.#x = clamp(value, 0, 1);
   }
-  constructor(id: string) {
+  constructor(id: string, body: Body) {
     this.id = id;
+    this.body = body;
   }
   serialize() {
     return {
@@ -72,12 +74,14 @@ export class Game {
   players: Player[] = [];
   balls: Ball[] = [];
   state: GameState = GameState.Idle;
+  physics = new Physics();
   constructor() { }
   player(id: string) {
     return this.players.find(player => player.id === id);
   }
   addPlayer(id: string) {
-    this.players.push(new Player(id));
+    const body = this.physics.createPlayer();
+    this.players.push(new Player(id, body));
   }
   removePlayer(id: string) {
     this.players = this.players.filter(player => player.id !== id);
