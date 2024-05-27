@@ -16,6 +16,7 @@ export class GameManager {
     });
     game.addPlayer(playerId, name);
     this.#games.set(roomId, game);
+    this.pub(roomId, { type: "snapshot", world: game.serialize() }, true);
   }
   remove(roomId: string, playerId: string) {
     const game = this.#games.get(roomId);
