@@ -121,6 +121,14 @@ export class Game {
         if (ball == null || player == null) return;
 
         ball.lastHitPlayerId = player.id;
+
+        options?.pub?.({
+          type: "ballHit",
+          ball: {
+            x: ball.x,
+            y: ball.y,
+          }
+        });
       }
     });
 
