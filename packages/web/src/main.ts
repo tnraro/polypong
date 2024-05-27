@@ -1,7 +1,7 @@
 import { treaty } from "@elysiajs/eden";
 import type { App } from "server";
 import "./style.css";
-import { clamp } from "utils";
+import { clamp, assign } from "utils";
 
 lobby();
 
@@ -88,6 +88,9 @@ async function run(options: { nickname: string }) {
         index: data.index,
         alpha: 1,
       }
+    }
+    if (data.type === "delta") {
+      world = assign(world, data.delta) as World;
     }
   });
   ws.on("error", (e) => {

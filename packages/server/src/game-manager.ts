@@ -4,18 +4,20 @@ import { Game } from "./game";
 export class GameManager {
   ws: any;
   #games = new Map<string, Game>();
+  #roomIdByGame = new WeakMap<Game, string>();
   #server;
   constructor(server: Server) {
     this.#server = server;
   }
   add(roomId: string, playerId: string, name: string) {
     const game = this.#games.get(roomId) ?? new Game({
-      onBallOut: (event) => {
+      pub: (event) => {
         this.pub(roomId, event, true);
       },
     });
     game.addPlayer(playerId, name);
     this.#games.set(roomId, game);
+    this.#roomIdByGame.set(game, roomId);
   }
   remove(roomId: string, playerId: string) {
     const game = this.#games.get(roomId);
@@ -23,6 +25,7 @@ export class GameManager {
     game.removePlayer(playerId);
     if (game.players.length === 0) {
       this.#games.delete(roomId);
+      this.#roomIdByGame.delete(game);
     }
   }
   get(roomId: string) {
@@ -33,13 +36,16 @@ export class GameManager {
       game.update(delta);
     }
   }
+  /**
+   * @deprecated
+   */
   publish() {
     for (const [id, game] of this.#games) {
       this.pub(id, { type: "snapshot", world: game.serialize() }, true);
     }
   }
   pub(roomId: string, data: unknown, compress?: boolean) {
-    this.#server.publish(roomId, JSON.stringify(data), compress);
+    this.#server?.publish(roomId, JSON.stringify(data), compress);
   }
   serialize() {
     return [...this.#games].map(([id, game]) => ({

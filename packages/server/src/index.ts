@@ -55,7 +55,6 @@ const gameManager = new GameManager(app.server!);
 
 setInterval(() => {
   gameManager.update(1 / 60);
-  gameManager.publish();
 }, 1000 / 60);
 
 export type App = typeof app;

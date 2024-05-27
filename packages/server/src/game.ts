@@ -1,5 +1,5 @@
 import { Bodies, Body, Composite, Engine, Events, Pair } from "matter-js";
-import { clamp } from "utils";
+import { clamp, delta } from "utils";
 
 export class Player {
   readonly id: string;
@@ -80,14 +80,16 @@ export class Game {
   balls: Ball[] = [];
   state: GameState = GameState.Idle;
   physics;
-  constructor(options?: { onBallOut: (event: { type: "ballOut", index: number }) => void }) {
+  pub;
+  constructor(options?: { pub: (event: unknown) => void }) {
+    this.pub = options?.pub;
     this.physics = new Physics({
       onBallOut: (body) => {
         const theta = (Math.atan2(body.position.y, body.position.x) + Math.PI * 2) % (Math.PI * 2);
         const pie = Math.PI * 2 / this.players.length;
         const index = Math.floor(theta / pie);
 
-        options?.onBallOut?.({
+        options?.pub?.({
           type: "ballOut",
           index,
         });
@@ -121,6 +123,14 @@ export class Game {
         if (ball == null || player == null) return;
 
         ball.lastHitPlayerId = player.id;
+
+        options?.pub?.({
+          type: "ballHit",
+          ball: {
+            x: ball.x,
+            y: ball.y,
+          }
+        });
       }
     });
 
@@ -134,6 +144,7 @@ export class Game {
     const player = new Player(id, body, this.players.length, this, name);
     this.players.push(player);
     player.x = 0.5;
+    this.pub?.({ type: "snapshot", world: this.serialize() });
   }
   removePlayer(id: string) {
     const player = this.players.find(player => player.id === id);
@@ -146,6 +157,7 @@ export class Game {
         player.index = index;
         return player
       });
+    this.pub?.({ type: "snapshot", world: this.serialize() });
   }
   ball(id: string) {
     return this.balls.find(ball => ball.id === id);
@@ -156,7 +168,31 @@ export class Game {
   }
   update(delta: number) {
     Engine.update(this.physics.engine, delta);
+    {
+      const delta = this.delta();
+      if (!Bun.deepEquals(delta, this.#lastPublishedDelta, true)) {
+        this.pub?.({ type: "delta", delta });
+        this.#lastPublishedDelta = delta;
+      }
+    }
   }
+  #lastSerializedState: unknown;
+  #lastPublishedDelta: unknown;
+  delta() {
+    if (this.#lastSerializedState == null) {
+      const result = this.serialize();
+      this.#lastSerializedState = result;
+      return result;
+    } else {
+      const serialized = this.serialize();
+      const result = delta(this.#lastSerializedState, serialized);
+      this.#lastSerializedState = serialized;
+      return result;
+    }
+  }
+  /**
+   * @deprecated
+   */
   serialize() {
     return {
       players: this.players.map(player => player.serialize()),
