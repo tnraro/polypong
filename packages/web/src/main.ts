@@ -276,10 +276,7 @@ async function run(options: { nickname: string }) {
   function input(e: MouseEvent) {
     x = toRelativeX(e.clientX);
 
-    ws.send({
-      type: "x",
-      value: x,
-    });
+    sendX(x);
   }
   function toRelativeX(x: number) {
     return clamp((window.innerWidth / 2 - x) / 160, -1, 1) / 2 + 0.5;
