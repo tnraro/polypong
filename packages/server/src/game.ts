@@ -157,6 +157,7 @@ export class Game {
         player.index = index;
         return player
       });
+    this.pub?.({ type: "snapshot", world: this.serialize() });
   }
   ball(id: string) {
     return this.balls.find(ball => ball.id === id);
@@ -167,6 +168,7 @@ export class Game {
   }
   update(delta: number) {
     Engine.update(this.physics.engine, delta);
+    this.pub?.({ type: "snapshot", world: this.serialize() });
   }
   serialize() {
     return {
