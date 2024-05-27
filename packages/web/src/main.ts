@@ -287,6 +287,9 @@ async function run(options: { nickname: string }) {
       value: x,
     });
   }
+  function setX(_x: number) {
+    x = _x;
+  }
 
   window.addEventListener("mousemove", input);
 }
