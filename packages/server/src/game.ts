@@ -190,6 +190,9 @@ export class Game {
       return result;
     }
   }
+  /**
+   * @deprecated
+   */
   serialize() {
     return {
       players: this.players.map(player => player.serialize()),
