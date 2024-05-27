@@ -33,6 +33,9 @@ export class GameManager {
       game.update(delta);
     }
   }
+  /**
+   * @deprecated
+   */
   publish() {
     for (const [id, game] of this.#games) {
       this.pub(id, { type: "snapshot", world: game.serialize() }, true);
