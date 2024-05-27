@@ -10,7 +10,7 @@ export class GameManager {
   }
   add(roomId: string, playerId: string, name: string) {
     const game = this.#games.get(roomId) ?? new Game({
-      onBallOut: (event) => {
+      pub: (event) => {
         this.pub(roomId, event, true);
       },
     });
