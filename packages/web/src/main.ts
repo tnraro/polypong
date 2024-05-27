@@ -273,9 +273,6 @@ async function run(options: { nickname: string }) {
   window.addEventListener("resize", resize);
 
   let x = 0.5;
-  function input(e: MouseEvent) {
-    updateX(e.clientX);
-  }
   function toRelativeX(x: number) {
     return clamp((window.innerWidth / 2 - x) / 160, -1, 1) / 2 + 0.5;
   }
@@ -294,5 +291,7 @@ async function run(options: { nickname: string }) {
     sendX(_x);
   }
 
-  window.addEventListener("mousemove", input);
+  window.addEventListener("mousemove", (e) => {
+    updateX(e.clientX);
+  });
 }
