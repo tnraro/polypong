@@ -294,4 +294,10 @@ async function run(options: { nickname: string }) {
   window.addEventListener("mousemove", (e) => {
     updateX(e.clientX);
   });
+  window.addEventListener("touchmove", (e) => {
+    const sum = [...e.touches]
+      .reduce((sum, touch) => sum + touch.clientX, 0);
+    const centerOfMass = sum / e.touches.length;
+    updateX(centerOfMass);
+  });
 }
