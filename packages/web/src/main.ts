@@ -281,6 +281,9 @@ async function run(options: { nickname: string }) {
       value: x,
     });
   }
+  function toRelativeX(x: number) {
+    return clamp((window.innerWidth / 2 - x) / 160, -1, 1) / 2 + 0.5;
+  }
 
   window.addEventListener("mousemove", input);
 }
