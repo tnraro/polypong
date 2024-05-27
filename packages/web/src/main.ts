@@ -284,6 +284,12 @@ async function run(options: { nickname: string }) {
   function toRelativeX(x: number) {
     return clamp((window.innerWidth / 2 - x) / 160, -1, 1) / 2 + 0.5;
   }
+  function sendX(x: number) {
+    ws.send({
+      type: "x",
+      value: x,
+    });
+  }
 
   window.addEventListener("mousemove", input);
 }
