@@ -4,6 +4,7 @@ import { Game } from "./game";
 export class GameManager {
   ws: any;
   #games = new Map<string, Game>();
+  #roomIdByGame = new WeakMap<Game, string>();
   #server;
   constructor(server: Server) {
     this.#server = server;
@@ -16,6 +17,7 @@ export class GameManager {
     });
     game.addPlayer(playerId, name);
     this.#games.set(roomId, game);
+    this.#roomIdByGame.set(game, roomId);
     this.pub(roomId, { type: "snapshot", world: game.serialize() }, true);
   }
   remove(roomId: string, playerId: string) {
@@ -24,6 +26,7 @@ export class GameManager {
     game.removePlayer(playerId);
     if (game.players.length === 0) {
       this.#games.delete(roomId);
+      this.#roomIdByGame.delete(game);
     }
   }
   get(roomId: string) {
