@@ -80,7 +80,9 @@ export class Game {
   balls: Ball[] = [];
   state: GameState = GameState.Idle;
   physics;
+  pub;
   constructor(options?: { pub: (event: unknown) => void }) {
+    this.pub = options?.pub;
     this.physics = new Physics({
       onBallOut: (body) => {
         const theta = (Math.atan2(body.position.y, body.position.x) + Math.PI * 2) % (Math.PI * 2);
@@ -142,6 +144,7 @@ export class Game {
     const player = new Player(id, body, this.players.length, this, name);
     this.players.push(player);
     player.x = 0.5;
+    this.pub?.({ type: "snapshot", world: this.serialize() });
   }
   removePlayer(id: string) {
     const player = this.players.find(player => player.id === id);
