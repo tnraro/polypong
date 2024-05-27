@@ -274,7 +274,7 @@ async function run(options: { nickname: string }) {
 
   let x = 0.5;
   function input(e: MouseEvent) {
-    x = clamp((window.innerWidth / 2 - e.clientX) / 160, -1, 1) / 2 + 0.5;
+    x = toRelativeX(e.clientX);
 
     ws.send({
       type: "x",
