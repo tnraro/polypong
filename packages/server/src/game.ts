@@ -1,5 +1,5 @@
 import { Bodies, Body, Composite, Engine, Events, Pair } from "matter-js";
-import { clamp } from "utils";
+import { clamp, delta } from "utils";
 
 export class Player {
   readonly id: string;
@@ -168,7 +168,20 @@ export class Game {
   }
   update(delta: number) {
     Engine.update(this.physics.engine, delta);
-    this.pub?.({ type: "snapshot", world: this.serialize() });
+    this.pub?.({ type: "delta", delta: this.delta() });
+  }
+  #lastSerializedState: unknown;
+  delta() {
+    if (this.#lastSerializedState == null) {
+      const result = this.serialize();
+      this.#lastSerializedState = result;
+      return result;
+    } else {
+      const serialized = this.serialize();
+      const result = delta(this.#lastSerializedState, serialized);
+      this.#lastSerializedState = serialized;
+      return result;
+    }
   }
   serialize() {
     return {
