@@ -290,6 +290,11 @@ async function run(options: { nickname: string }) {
   function setX(_x: number) {
     x = _x;
   }
+  function updateX(x: number) {
+    const _x = toRelativeX(x);
+    setX(_x);
+    sendX(_x);
+  }
 
   window.addEventListener("mousemove", input);
 }
