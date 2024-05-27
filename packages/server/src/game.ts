@@ -168,9 +168,16 @@ export class Game {
   }
   update(delta: number) {
     Engine.update(this.physics.engine, delta);
-    this.pub?.({ type: "delta", delta: this.delta() });
+    {
+      const delta = this.delta();
+      if (!Bun.deepEquals(delta, this.#lastPublishedDelta, true)) {
+        this.pub?.({ type: "delta", delta });
+        this.#lastPublishedDelta = delta;
+      }
+    }
   }
   #lastSerializedState: unknown;
+  #lastPublishedDelta: unknown;
   delta() {
     if (this.#lastSerializedState == null) {
       const result = this.serialize();
