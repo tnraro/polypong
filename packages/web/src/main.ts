@@ -114,6 +114,7 @@ async function run(options: { nickname: string }) {
     context.translate($canvas.width / 2, $canvas.height / 2);
 
     drawControlIndicator(context);
+    useCamera(context);
     context.rotate(-(myIndex() + 0.5) * getPie() + Math.PI / 2);
 
     drawMap(context);
@@ -183,6 +184,20 @@ async function run(options: { nickname: string }) {
         if (ballOut?.index === myIndex()) return "23deg";
         return "200deg";
       }
+    }
+    function useCamera(context: CanvasRenderingContext2D) {
+      const pie = getPie();
+
+      const theta = pie * (x - 0.5) + Math.PI / 2;
+      const scaleX = clamp(MAP_RADIUS - window.innerWidth / 2, 0, MAP_RADIUS);
+      const scaleY = clamp(MAP_RADIUS - window.innerHeight / 2, 0, MAP_RADIUS);
+      const scale = clamp(window.innerWidth / MAP_RADIUS - 1, 0.7, 1);
+
+      context.translate(
+        -Math.cos(theta) * scaleX,
+        -Math.sin(theta) * scaleY,
+      );
+      context.scale(scale, scale);
     }
     function drawPlayer(context: CanvasRenderingContext2D, player: Player) {
       context.save();
