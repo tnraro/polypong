@@ -165,6 +165,7 @@ export class Game {
   addBall() {
     const body = this.physics.createBall();
     this.balls.push(new Ball(body));
+    this.pub?.({ type: "snapshot", world: this.serialize() });
   }
   update(delta: number) {
     Engine.update(this.physics.engine, delta);
