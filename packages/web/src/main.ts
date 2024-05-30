@@ -124,7 +124,11 @@ async function run(options: { nickname: string }) {
     drawBallOutIndicator(context);
 
     for (const player of world.players) {
-      drawPlayer(context, player);
+      if (player.id === me) {
+        drawPlayer(context, { ...player, x })
+      } else {
+        drawPlayer(context, player);
+      }
     }
     for (const ball of world.balls) {
       drawBall(context, ball);
