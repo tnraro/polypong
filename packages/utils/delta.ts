@@ -51,7 +51,6 @@ export function assign(a: unknown, b: unknown): unknown {
       return result;
     }
     const ak = Object.keys(a);
-    const bk = Object.keys(b);
 
     const result: Record<string, unknown> = Object.assign(a);
     for (const key of ak) {
