@@ -120,7 +120,21 @@ async function run(options: { nickname: string }) {
   const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 
   const MAP_RADIUS = 16 * 20;
+  let lastTime = performance.now();
+  function interpolation() {
+    const delta = (performance.now() - lastTime);
+    balls.forEach((ball, i) => {
+      const vx = ball.after.x - ball.before.x;
+      const vy = ball.after.y - ball.before.y;
+      const vt = ball.after.t - ball.before.t;
+
+      world.balls[i].x += vx / vt * delta;
+      world.balls[i].y += vy / vt * delta;
+    });
+    lastTime = performance.now();
+  }
   function render() {
+    interpolation();
     const context = $canvas?.getContext("2d");
     if (context == null) return;
 
