@@ -169,12 +169,15 @@ export class Game {
   }
   update(delta: number) {
     Engine.update(this.physics.engine, delta);
-    {
-      const delta = this.delta();
-      if (!Bun.deepEquals(delta, this.#lastPublishedDelta, true)) {
-        this.pub?.({ type: "delta", delta });
-        this.#lastPublishedDelta = delta;
-      }
+    this.publish();
+  }
+  #count = 0;
+  publish() {
+    if (this.#count++ % 2 === 1) return;
+    const delta = this.delta();
+    if (!Bun.deepEquals(delta, this.#lastPublishedDelta, true)) {
+      this.pub?.({ type: "delta", delta });
+      this.#lastPublishedDelta = delta;
     }
   }
   #lastSerializedState: unknown;
