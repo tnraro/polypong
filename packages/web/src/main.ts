@@ -65,6 +65,21 @@ async function run(options: { nickname: string }) {
   };
   let me: string;
   let ballOut: { index: number, alpha: number } | undefined;
+  let balls: Record<"before" | "after", { x: number, y: number, t: number }>[] = [];
+  function updateBalls() {
+    balls = world.balls.map((ball, i) => {
+      if (balls[i] == null) {
+        return {
+          before: { x: ball.x, y: ball.y, t: performance.now() },
+          after: { x: ball.x + ball.vx, y: ball.y + ball.vy, t: performance.now() },
+        }
+      }
+      return {
+        before: balls[i].after,
+        after: { x: ball.x, y: ball.y, t: performance.now() }
+      }
+    })
+  }
   function myIndex() {
     return world.players.find(player => player.id === me)?.index ?? 0;
   }
@@ -79,6 +94,7 @@ async function run(options: { nickname: string }) {
     const data: any = message.data;
     if (data.type === "snapshot") {
       world = data.world;
+      updateBalls();
     }
     if (data.type === "me:enter") {
       me = data.id;
@@ -91,6 +107,7 @@ async function run(options: { nickname: string }) {
     }
     if (data.type === "delta") {
       world = assign(world, data.delta) as World;
+      updateBalls();
     }
   });
   ws.on("error", (e) => {
@@ -103,7 +120,21 @@ async function run(options: { nickname: string }) {
   const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 
   const MAP_RADIUS = 16 * 20;
+  let lastTime = performance.now();
+  function interpolation() {
+    const delta = (performance.now() - lastTime);
+    balls.forEach((ball, i) => {
+      const vx = ball.after.x - ball.before.x;
+      const vy = ball.after.y - ball.before.y;
+      const vt = ball.after.t - ball.before.t;
+
+      world.balls[i].x += vx / vt * delta;
+      world.balls[i].y += vy / vt * delta;
+    });
+    lastTime = performance.now();
+  }
   function render() {
+    interpolation();
     const context = $canvas?.getContext("2d");
     if (context == null) return;
 
@@ -124,7 +155,11 @@ async function run(options: { nickname: string }) {
     drawBallOutIndicator(context);
 
     for (const player of world.players) {
-      drawPlayer(context, player);
+      if (player.id === me) {
+        drawPlayer(context, { ...player, x })
+      } else {
+        drawPlayer(context, player);
+      }
     }
     for (const ball of world.balls) {
       drawBall(context, ball);
