@@ -1,0 +1,8 @@
+services:
+  app:
+    image: tnraro/polypong:latest
+    restart: unless-stopped
+    ports:
+      - ${PORT}:8080
+    environment:
+      - VITE_API_ENTRYPOINT=${API_ENTRYPOINT}
